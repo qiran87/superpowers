@@ -11,6 +11,81 @@ Help turn ideas into fully formed designs and specs through natural collaborativ
 
 Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design in three parts, presenting each part in small sections (200-300 words), checking after each section whether it looks right so far.
 
+## Pre-Check: Documentation Health
+
+**Before understanding the project context, check if documentation needs systematic update.**
+
+### Why This Matters
+
+Outdated documentation can lead to:
+- Designing features that already exist
+- Missing architectural constraints and patterns
+- Inconsistent understanding of the system
+- Wasted development effort
+
+### The Check Process
+
+**Step 1: Ask the user**
+
+Use the `AskUserQuestion` tool with this configuration:
+
+```yaml
+questions:
+  - question: "Before we dive into requirements, I need to check: Does the current project documentation accurately reflect the codebase, or has it become outdated as the code evolved?"
+    header: "Doc Status"
+    options:
+      - label: "Documentation is current"
+        description: "Project docs are up-to-date, proceed with brainstorming"
+      - label: "Documentation needs update"
+        description: "Systematically analyze codebase and generate fresh documentation (11 docs, ~5-10 min)"
+      - label: "Not sure"
+        description: "I'll check the docs and let you know if they seem outdated"
+    multiSelect: false
+```
+
+**Step 2: Handle user response**
+
+**If user selects "Documentation needs update":**
+
+1. Announce: "Using **superpowers:code-structure-reader** to systematically analyze the codebase and generate comprehensive documentation."
+
+2. Use the `Skill` tool to invoke `superpowers:code-structure-reader`
+
+3. Wait for the skill to complete. It will generate 11 documents at `docs/project-analysis/`:
+   - 00-overview.md (Project overview)
+   - 01-frontend-components.md (Frontend architecture)
+   - 02-backend-apis.md (API endpoints)
+   - 03-backend-domains.md (Domain models)
+   - 04-database-schemas.md (Database structure)
+   - 05-third-party-deps.md (Dependencies)
+   - 06-dev-guide.md (Development guide)
+   - 07-code-relations.md (Dependencies + calls + data flows)
+   - 08-architecture-patterns.md (Architecture patterns)
+   - 09-testing-strategy.md (Testing approach)
+   - 10-quality-reports.md (Technical debt + security)
+   - 11-interaction-index.md (Navigation index)
+
+4. After completion, announce: "✅ Documentation analysis complete! Generated 11 comprehensive documents at `docs/project-analysis/`. I'll use this fresh context to inform our design discussion."
+
+5. Proceed to "Understanding the idea" section with updated context
+
+**If user selects "Documentation is current":**
+
+- Skip code analysis
+- Proceed directly to "Understanding the idea" section
+- Use existing documentation for context
+
+**If user selects "Not sure":**
+
+- Quick check: Look at `docs/` directory and recent git commits
+- If docs exist and are recent (< 30 days old), proceed
+- If docs are missing or old (> 60 days), recommend update
+- Ask user again with recommendation
+
+**Step 3: Continue to brainstorming**
+
+Whether documentation was updated or not, proceed to the "Understanding the idea" section below.
+
 ## The Process
 
 **Understanding the idea:**

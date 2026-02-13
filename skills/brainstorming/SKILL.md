@@ -116,6 +116,14 @@ Whether documentation was updated or not, proceed to the "Understanding the idea
 
 **Part 2A: Backend Technical Design (for backend team)**
 
+> **⚠️ IMPORTANT:** Before presenting this section, use **superpowers:design-with-existing-modules** to:
+> 1. Check `docs/project-analysis/` for existing modules
+> 2. Identify reusable components, APIs, domain models, database schemas
+> 3. Make informed decisions: REUSE → MODIFY → CREATE NEW
+> 4. Update project documentation with changes
+>
+> This ensures the technical design leverages existing investments and avoids duplication.
+
 - What are the architectural layers and their responsibilities?
 - What are the cross-cutting concerns (logging, caching, metrics)?
 - How will services communicate (sync vs async, message queue, event-driven)?
@@ -176,6 +184,14 @@ Whether documentation was updated or not, proceed to the "Understanding the idea
 > - Can be completed within single service
 
 **Part 2B: Frontend Technical Design (for frontend team)**
+
+> **⚠️ IMPORTANT:** Before presenting this section, use **superpowers:design-with-existing-modules** to:
+> 1. Check `docs/project-analysis/01-frontend-components.md` for existing components
+> 2. Identify reusable UI components, layouts, hooks, contexts
+> 3. Make informed decisions: REUSE → MODIFY → CREATE NEW
+> 4. Update project documentation with changes
+>
+> This ensures the frontend design maintains consistency and leverages existing patterns.
 
 - How will we structure the application routing and layouts?
 - What are the code organization patterns (feature-based, layer-based)?

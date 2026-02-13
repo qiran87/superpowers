@@ -115,6 +115,15 @@ git merge <feature-branch>
 git branch -d <feature-branch>
 ```
 
+**Record to Execution Log:**
+```markdown
+- [ ] Update EXECUTION_LOG.md with:
+  - Phase: Finishing a Development Branch
+  - Action: Completed "{option-selected}" (Merge/PR/Keep/Discard)
+  - Details: Branch completion summary, tests status, cleanup actions
+  - Next: Start next feature or return to main branch
+```
+
 Then: Cleanup worktree (Step 5)
 
 #### Option 2: Push and Create PR
@@ -132,6 +141,15 @@ gh pr create --title "<title>" --body "$(cat <<'EOF'
 - [ ] <verification steps>
 EOF
 )"
+```
+
+**Record to Execution Log:**
+```markdown
+- [ ] Update EXECUTION_LOG.md with:
+  - Phase: Finishing a Development Branch
+  - Action: Completed "{option-selected}" (Merge/PR/Keep/Discard)
+  - Details: Branch completion summary, tests status, cleanup actions
+  - Next: Start next feature or return to main branch
 ```
 
 Then: Cleanup worktree (Step 5)
@@ -160,6 +178,15 @@ If confirmed:
 ```bash
 git checkout <base-branch>
 git branch -D <feature-branch>
+```
+
+**Record to Execution Log:**
+```markdown
+- [ ] Update EXECUTION_LOG.md with:
+  - Phase: Finishing a Development Branch
+  - Action: Completed "{option-selected}" (Merge/PR/Keep/Discard)
+  - Details: Branch completion summary, tests status, cleanup actions
+  - Next: Start next feature or return to main branch
 ```
 
 Then: Cleanup worktree (Step 5)

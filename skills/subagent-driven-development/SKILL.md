@@ -35,6 +35,24 @@ digraph when_to_use {
 - Two-stage review after each task: spec compliance first, then code quality
 - Faster iteration (no human-in-loop between tasks)
 
+**Record to Execution Log:**
+```markdown
+- [ ] Update EXECUTION_LOG.md with:
+  - Phase: Subagent-Driven Development
+  - Action: Dispatched subagent for task "{task-name}"
+  - Details: Task completion summary, files modified, test results
+  - Next: {next-step}
+```
+- [ ] Use `mcp__spec-workflow__log-implementation` if spec-workflow MCP server is configured:
+  - specName: Current requirement/spec name
+  - taskId: Task number
+  - summary: Brief description of what was implemented
+  - filesModified: List of modified files
+  - filesCreated: List of created files
+  - statistics: { linesAdded, linesRemoved }
+  - artifacts: Structured data about implemented artifacts
+```
+
 ## The Process
 
 ```dot

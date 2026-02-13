@@ -86,6 +86,15 @@ questions:
 
 Whether documentation was updated or not, proceed to the "Understanding the idea" section below.
 
+**Record to Execution Log:**
+```markdown
+- [ ] Update EXECUTION_LOG.md with:
+  - Phase: Brainstorming
+  - Action: Completed brainstorming session for "{feature/concept}"
+  - Details: Design decisions made, alternatives explored, stakeholder questions answered
+  - Next: Proceed to writing-plans or design-with-existing-modules
+```
+
 ## The Process
 
 **Understanding the idea:**

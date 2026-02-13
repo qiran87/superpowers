@@ -102,4 +102,13 @@ You: [Fix progress indicators]
 - Show code/tests that prove it works
 - Request clarification
 
+**Record to Execution Log:**
+```markdown
+- [ ] Update EXECUTION_LOG.md with:
+  - Phase: Requesting Code Review
+  - Action: Completed code review for "{feature/branch}"
+  - Details: Critical/Important/Minor issues found, overall assessment
+  - Next: Fix issues or proceed to next step
+```
+
 See template at: requesting-code-review/code-reviewer.md

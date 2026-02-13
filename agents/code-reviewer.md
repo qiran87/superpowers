@@ -15,6 +15,25 @@ When reviewing completed work, you will:
    - Assess whether deviations are justified improvements or problematic departures
    - Verify that all planned functionality has been implemented
 
+> **🔍 Protocol Compliance Check:**
+>
+> Before reviewing code quality, you **MUST** use **superpowers:protocol-compliance-check** to verify the implementation matches protocol documentation.
+>
+> **Execute this step:**
+> 1. Invoke the protocol-compliance-check skill
+> 2. Verify all fields used are defined in protocol docs (`docs/project-analysis/03-backend-domains.md`, `02-backend-apis.md`)
+> 3. Check frontend-backend interface alignment (`docs/project-analysis/02-backend-apis.md`)
+> 4. Validate database operations match schema (`docs/project-analysis/04-database-schemas.md`)
+>
+> **If CRITICAL violations found:**
+> - **Severity:** CRITICAL (blocks PR merge)
+> - **Action:** Return to implementer for fixes, do NOT proceed to quality review
+> - **Rationale:** Protocol violations break contracts between components and must be fixed before quality review
+>
+> **If NO critical violations:**
+> - Proceed to code quality assessment (Step 2)
+> - Include compliance check results in your review report
+
 2. **Code Quality Assessment**:
    - Review code for adherence to established patterns and conventions
    - Check for proper error handling, type safety, and defensive programming

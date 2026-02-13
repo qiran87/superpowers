@@ -50,6 +50,9 @@ digraph process {
         "Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)" [shape=box];
         "Spec reviewer subagent confirms code matches spec?" [shape=diamond];
         "Implementer subagent fixes spec gaps" [shape=box];
+        "🔍 Protocol compliance check (superpowers:protocol-compliance-check)" [shape=box, style=filled, fillcolor=lightyellow];
+        "CRITICAL protocol violations found?" [shape=diamond];
+        "Implementer subagent fixes protocol violations" [shape=box];
         "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [shape=box];
         "Code quality reviewer subagent approves?" [shape=diamond];
         "Implementer subagent fixes quality issues" [shape=box];
@@ -70,7 +73,11 @@ digraph process {
     "Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)" -> "Spec reviewer subagent confirms code matches spec?";
     "Spec reviewer subagent confirms code matches spec?" -> "Implementer subagent fixes spec gaps" [label="no"];
     "Implementer subagent fixes spec gaps" -> "Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)" [label="re-review"];
-    "Spec reviewer subagent confirms code matches spec?" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="yes"];
+    "Spec reviewer subagent confirms code matches spec?" -> "🔍 Protocol compliance check (superpowers:protocol-compliance-check)" [label="yes"];
+    "🔍 Protocol compliance check (superpowers:protocol-compliance-check)" -> "CRITICAL protocol violations found?";
+    "CRITICAL protocol violations found?" -> "Implementer subagent fixes protocol violations" [label="yes"];
+    "Implementer subagent fixes protocol violations" -> "🔍 Protocol compliance check (superpowers:protocol-compliance-check)" [label="re-check"];
+    "CRITICAL protocol violations found?" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="no"];
     "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" -> "Code quality reviewer subagent approves?";
     "Code quality reviewer subagent approves?" -> "Implementer subagent fixes quality issues" [label="no"];
     "Implementer subagent fixes quality issues" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="re-review"];
@@ -116,6 +123,9 @@ Implementer: "Got it. Implementing now..."
 [Dispatch spec compliance reviewer]
 Spec reviewer: ✅ Spec compliant - all requirements met, nothing extra
 
+[🔍 Protocol compliance check]
+Protocol check: ✅ No violations - all fields defined, frontend-backend aligned, database operations match schema
+
 [Get git SHAs, dispatch code quality reviewer]
 Code reviewer: Strengths: Good test coverage, clean. Issues: None. Approved.
 
@@ -143,6 +153,9 @@ Implementer: Removed --json flag, added progress reporting
 
 [Spec reviewer reviews again]
 Spec reviewer: ✅ Spec compliant now
+
+[🔍 Protocol compliance check]
+Protocol check: ✅ No violations - implementation matches protocol docs
 
 [Dispatch code quality reviewer]
 Code reviewer: Strengths: Solid. Issues (Important): Magic number (100)
@@ -185,22 +198,24 @@ Done!
 
 **Quality gates:**
 - Self-review catches issues before handoff
-- Two-stage review: spec compliance, then code quality
+- Three-stage review: spec compliance, then **protocol compliance**, then code quality
 - Review loops ensure fixes actually work
 - Spec compliance prevents over/under-building
+- **Protocol compliance ensures implementation matches design documentation (fields, APIs, database)**
 - Code quality ensures implementation is well-built
 
 **Cost:**
-- More subagent invocations (implementer + 2 reviewers per task)
+- More subagent invocations (implementer + 3 reviews per task: spec, protocol, quality)
 - Controller does more prep work (extracting all tasks upfront)
 - Review loops add iterations
+- Protocol compliance check adds one more gate
 - But catches issues early (cheaper than debugging later)
 
 ## Red Flags
 
 **Never:**
 - Start implementation on main/master branch without explicit user consent
-- Skip reviews (spec compliance OR code quality)
+- Skip reviews (spec compliance OR protocol compliance OR code quality)
 - Proceed with unfixed issues
 - Dispatch multiple implementation subagents in parallel (conflicts)
 - Make subagent read plan file (provide full text instead)
@@ -208,9 +223,10 @@ Done!
 - Ignore subagent questions (answer before letting them proceed)
 - Accept "close enough" on spec compliance (spec reviewer found issues = not done)
 - Skip review loops (reviewer found issues = implementer fixes = review again)
-- Let implementer self-review replace actual review (both are needed)
-- **Start code quality review before spec compliance is ✅** (wrong order)
-- Move to next task while either review has open issues
+- Let implementer self-review replace actual review (all three are needed)
+- **Start code quality review before protocol compliance is ✅** (wrong order)
+- **Skip protocol compliance check** (protocol violations = broken contracts)
+- Move to next task while any review has open issues
 
 **If subagent asks questions:**
 - Answer clearly and completely
@@ -232,6 +248,7 @@ Done!
 **Required workflow skills:**
 - **superpowers:using-git-worktrees** - REQUIRED: Set up isolated workspace before starting
 - **superpowers:writing-plans** - Creates the plan this skill executes
+- **superpowers:protocol-compliance-check** - REQUIRED: Verify implementation matches protocol docs
 - **superpowers:requesting-code-review** - Code review template for reviewer subagents
 - **superpowers:finishing-a-development-branch** - Complete development after all tasks
 

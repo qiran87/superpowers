@@ -73,7 +73,16 @@ git diff {BASE_SHA}..{HEAD_SHA}
 - `test.sh` script executes all tests successfully?
 - README.md includes test coverage statistics?
 
-**5. Test Execution Verification:**
+**5. Web UI Testing with chrome-devtools-mcp:**
+- Browser automation used for web UI features (chrome-devtools-mcp MCP tools)?
+- UI interactions tested (navigation, forms, clicks, API verification)?
+- Console and network verification performed in tests?
+- End-to-end user flows tested with MCP tools (snapshots, interactions)?
+- Debugging artifacts captured (console logs, network requests, screenshots)?
+- Performance traces run for critical user flows with insights analysis?
+- Web UI tests organized in `tests/requirements/YYYY-MM-DD-name/integration/`?
+
+**6. Test Execution Verification:**
 ```bash
 cd tests/requirements/YYYY-MM-DD-requirement-name
 ./test.sh
@@ -190,6 +199,29 @@ cd tests/requirements/YYYY-MM-DD-requirement-name
    - Issue: Test depends on external API timing, fails 30% of runs
    - Impact: Unreliable CI/CD, false negatives
    - Fix: Add proper mocking or increase timeout thresholds
+
+5. **Missing Web UI testing with chrome-devtools-mcp**
+   - File: tests/integration/login-flow.test.ts:1-50
+   - Issue: Login form UI testing uses manual DOM manipulation instead of chrome-devtools-mcp browser automation
+   - Impact: Tests don't verify real browser behavior, console errors, or network requests
+   - Fix: Rewrite test using MCP tools (navigate_page, fill_form, click, list_console_messages, list_network_requests)
+   - Example:
+     ```typescript
+     // Current (manual DOM):
+     document.querySelector('#email').value = 'test@example.com';
+     document.querySelector('#submit').click();
+
+     // Should be (MCP browser automation):
+     await mcp__chrome-devtools__navigate_page({ url: 'http://localhost:3000/login' });
+     await mcp__chrome-devtools__fill_form({
+       elements: [
+         { uid: 'email-input', value: 'test@example.com' },
+         { uid: 'password-input', value: 'password123' }
+       ]
+     });
+     await mcp__chrome-devtools__click({ uid: 'submit-button' });
+     const consoleErrors = await mcp__chrome-devtools__list_console_messages({ types: ['error', 'warning'] });
+     ```
 
 #### Minor
 1. **Progress indicators**

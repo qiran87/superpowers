@@ -24,6 +24,37 @@ Guide completion of development work by presenting clear options and handling ch
 npm test / cargo test / pytest / go test ./...
 ```
 
+**🌐 For Web UI Projects: Verify chrome-devtools-mcp Integration**
+
+If this project contains web UI components, verify browser automation testing:
+
+```bash
+# Detect if this is a web UI project
+if [ -d "public/" ] || [ -d "src/" ] && grep -rq "package.json\|index.html" public/ src/ 2>/dev/null; then
+    echo "🌐 Web UI project detected"
+
+    # Check for integration tests using chrome-devtools-mcp
+    if [ -d "tests/requirements" ]; then
+        mcp_tests=$(find tests/requirements -type f -name "*.test.ts" -o -name "*.test.js" | xargs grep -l "chrome-devtools" 2>/dev/null | wc -l)
+
+        if [ "$mcp_tests" -eq 0 ]; then
+            echo "⚠️  No chrome-devtools-mcp integration tests found"
+            echo ""
+            echo "Recommendation: Add integration tests using chrome-devtools-mcp MCP tools for:"
+            echo "  • Browser automation (navigate_page, fill_form, click)"
+            echo "  • Console verification (list_console_messages)"
+            echo "  • Network verification (list_network_requests)"
+            echo "  • Performance tracing (performance_start_trace/stop_trace)"
+            echo ""
+            echo "Cannot proceed with merge/PR until Web UI testing is complete."
+            exit 1
+        else
+            echo "✓ chrome-devtools-mcp integration tests verified ($mcp_tests test files)"
+        fi
+    fi
+fi
+```
+
 **If tests fail:**
 ```
 Tests failing (<N> failures). Must fix before completing:

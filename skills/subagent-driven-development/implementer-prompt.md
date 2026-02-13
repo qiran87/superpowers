@@ -65,6 +65,7 @@ Task tool (general-purpose):
     - Did I follow TDD if required?
     - Are tests comprehensive?
     - **Are tests organized by requirement?** (See Test Organization below)
+    - **For web UI testing:** Use chrome-devtools-mcp MCP tools for browser automation, testing, and debugging
 
     If you find issues during self-review, fix them now before reporting.
 
@@ -124,7 +125,58 @@ Task tool (general-purpose):
 
     See: `docs/test-organization-guide.md` for complete details.
 
-    ## Report Format
+    ## Web UI Testing with chrome-devtools-mcp
+
+    **When to use:** For testing web applications, browser automation, UI interactions, and debugging frontend issues.
+
+    **Available MCP Tools:**
+    - **Navigation:** `navigate_page`, `new_page`, `list_pages`, `select_page`
+    - **Interaction:** `click`, `fill`, `fill_form`, `hover`, `press_key`, `drag`
+    - **Analysis:** `take_snapshot`, `take_screenshot`, `evaluate_script`
+    - **Debugging:** `list_console_messages`, `list_network_requests`, `get_console_message`, `get_network_request`
+    - **Performance:** `performance_start_trace`, `performance_stop_trace`, `performance_analyze_insight`
+    - **Emulation:** `emulate` (viewport, network, geolocation, CPU throttling, user agent)
+    - **Dialog/Upload:** `handle_dialog`, `upload_file`
+
+    **Testing Workflow:**
+    1. **Setup:** Start browser and navigate to test URL
+    2. **Snapshot:** Take initial snapshot for element reference
+    3. **Interact:** Perform user actions (click, fill forms, navigate)
+    4. **Verify:** Check console messages, network requests, DOM state
+    5. **Debug:** Analyze failures with console logs, network traces
+    6. **Performance:** Run performance traces for critical user flows
+
+    **Example Test Case:**
+    ```bash
+    # Navigate to page
+    mcp__chrome-devtools__navigate_page url="http://localhost:3000/login"
+
+    # Take snapshot to get element UIDs
+    mcp__chrome-devtools__take_snapshot
+
+    # Fill login form
+    mcp__chrome-devtools__fill_form elements='[{"uid": "email-input", "value": "test@example.com"}, {"uid": "password-input", "value": "password123"}]'
+
+    # Click submit button
+    mcp__chrome-devtools__click uid="submit-button"
+
+    # Wait for navigation
+    mcp__chrome-devtools__wait_for text="Dashboard"
+
+    # Verify console has no errors
+    mcp__chrome-devtools__list_console_messages types='["error", "warning"]'
+
+    # Verify API requests
+    mcp__chrome-devtools__list_network_requests resourceTypes='["xhr", "fetch"]'
+    ```
+
+    **Integration with Test Files:**
+    - Create test files in `tests/requirements/YYYY-MM-DD-name/integration/` for end-to-end UI tests
+    - Use MCP tools within test execution flow
+    - Capture screenshots and console logs for debugging
+    - Store test artifacts (screenshots, traces) in `tests/requirements/YYYY-MM-DD-name/artifacts/`
+
+    **Report Format
 
     When done, report:
     - What you implemented

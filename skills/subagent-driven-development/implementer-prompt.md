@@ -64,8 +64,65 @@ Task tool (general-purpose):
     - Do tests actually verify behavior (not just mock behavior)?
     - Did I follow TDD if required?
     - Are tests comprehensive?
+    - **Are tests organized by requirement?** (See Test Organization below)
 
     If you find issues during self-review, fix them now before reporting.
+
+    ## Test Organization (Requirement-Based)
+
+    **If this task is part of a requirement:**
+
+    Tests must be organized in the requirement-based structure:
+    ```
+    tests/requirements/YYYY-MM-DD-requirement-name/
+    ├── README.md
+    ├── tasks.md
+    ├── test.sh
+    ├── unit/
+    │   └── feature.test.ts
+    └── integration/
+        └── flow.test.ts
+    ```
+
+    **Required Test File Metadata:**
+
+    Every test file MUST include this header:
+    ```typescript
+    /**
+     * [Test Suite Name]
+     *
+     * @requirement YYYY-MM-DD-requirement-name
+     * @task task-id-task-name
+     * @created YYYY-MM-DD
+     * @author AI Agent (subagent-driven-development)
+     */
+    ```
+
+    **Steps:**
+    1. Create/update test file in appropriate directory (unit/ or integration/)
+    2. Add required metadata header
+    3. Follow TDD: Write test → Run RED → Implement → Run GREEN
+    4. Update `tasks.md` with test case list and status
+    5. Run `./test.sh` to verify all tests pass
+
+    **Test File Creation:**
+    - Unit tests go in `unit/` directory
+    - Integration tests go in `integration/` directory
+    - Test file name should reflect the feature being tested
+    - One task can have multiple test files if logical grouping exists
+
+    **After Implementation:**
+    - Update `tasks.md`: Mark task as ✅ Completed, add test case list
+    - Update `README.md`: Update progress statistics
+    - Commit with message: `feat(scope): description (Task #N of Req #YYYY-MM-DD-name)`
+
+    **Verification:**
+    ```bash
+    cd tests/requirements/YYYY-MM-DD-requirement-name
+    ./test.sh
+    ```
+
+    See: `docs/test-organization-guide.md` for complete details.
 
     ## Report Format
 

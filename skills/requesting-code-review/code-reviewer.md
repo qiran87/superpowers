@@ -42,11 +42,46 @@ git diff {BASE_SHA}..{HEAD_SHA}
 - Performance implications?
 - Security concerns?
 
-**Testing:**
-- Tests actually test logic (not mocks)?
-- Edge cases covered?
-- Integration tests where needed?
+**Testing (Enhanced Review):**
+
+**1. TDD Compliance Check:**
+- Tests written before implementation (verify git history)?
+- Test follows RED-GREEN-REFACTOR cycle?
+- Test metadata headers present (@requirement, @task, @created, @author)?
+- No "write code first, then add tests" pattern?
+
+**2. Test Coverage Analysis:**
+- Unit tests cover all public APIs?
+- Integration tests cover critical user flows?
+- Edge cases and error paths tested?
+- Happy path and failure scenarios covered?
+- Boundary values and limits tested?
+
+**3. Test Quality Assessment:**
+- Tests verify behavior (not just mock behavior)?
+- Test names are descriptive and specific?
+- No fragile tests (implementation-coupled)?
+- Appropriate use of fixtures and mocks?
+- Tests are independent and isolated?
+- Test run time is reasonable?
+
+**4. Organization Verification:**
+- Tests organized by requirement in `tests/requirements/YYYY-MM-DD-name/`?
+- Unit tests in `unit/` directory?
+- Integration tests in `integration/` directory?
+- `tasks.md` updated with test case lists?
+- `test.sh` script executes all tests successfully?
+- README.md includes test coverage statistics?
+
+**5. Test Execution Verification:**
+```bash
+cd tests/requirements/YYYY-MM-DD-requirement-name
+./test.sh
+```
 - All tests passing?
+- No flaky tests?
+- No skipped tests without justification?
+- Test execution time documented?
 
 **Requirements:**
 - All plan requirements met?
@@ -117,16 +152,44 @@ git diff {BASE_SHA}..{HEAD_SHA}
 
 ### Issues
 
-#### Important
-1. **Missing help text in CLI wrapper**
-   - File: index-conversations:1-31
-   - Issue: No --help flag, users won't discover --concurrency
-   - Fix: Add --help case with usage examples
+#### Critical (Must Fix)
+1. **TDD violation - tests written after implementation**
+   - Files: auth.ts:1-150, unit/auth.test.ts:1-80
+   - Issue: Git history shows auth.ts committed 20 minutes before auth.test.ts
+   - Impact: Tests may not validate actual behavior, only implementation details
+   - Fix: Delete implementation, restart with TDD (write tests first)
+   - Evidence: `git log --format="%H %ci" -- auth.ts unit/auth.test.ts`
 
-2. **Date validation missing**
-   - File: search.ts:25-27
-   - Issue: Invalid dates silently return no results
-   - Fix: Validate ISO format, throw error with example
+2. **No tests for critical authentication logic**
+   - File: services/auth.ts:85-120
+   - Issue: JWT validation and token refresh functions have zero test coverage
+   - Impact: Security vulnerabilities, potential authentication bypass
+   - Fix: Add comprehensive unit tests before merging
+
+#### Important
+1. **Missing test metadata headers**
+   - Files: unit/login.test.ts:1-10, integration/auth-flow.test.ts:1-12
+   - Issue: No @requirement, @task, @created, @author tags in test files
+   - Impact: Cannot trace tests to requirements/tasks
+   - Fix: Add metadata headers to all test files following template
+
+2. **Test coverage gaps - error paths not tested**
+   - File: auth.ts:45-67
+   - Issue: Function has 5 error paths, only 2 tested in unit/auth.test.ts:12-45
+   - Impact: Unhandled errors may cause crashes in production
+   - Fix: Add test cases for all error paths (invalid token, network timeout, malformed response)
+
+3. **Tests not organized by requirement**
+   - Directory: tests/unit/
+   - Issue: Test files scattered in generic unit/ directory, not in tests/requirements/YYYY-MM-DD-name/
+   - Impact: Cannot verify which tests belong to which requirement
+   - Fix: Move test files to requirement-based structure with proper README.md and tasks.md
+
+4. **Flaky integration test**
+   - File: integration/auth-flow.test.ts:145-160
+   - Issue: Test depends on external API timing, fails 30% of runs
+   - Impact: Unreliable CI/CD, false negatives
+   - Fix: Add proper mocking or increase timeout thresholds
 
 #### Minor
 1. **Progress indicators**

@@ -38,7 +38,21 @@ When reviewing completed work, you will:
    - Review code for adherence to established patterns and conventions
    - Check for proper error handling, type safety, and defensive programming
    - Evaluate code organization, naming conventions, and maintainability
-   - Assess test coverage and quality of test implementations
+
+> **🧪 Enhanced Test Review:**
+> When assessing test coverage and quality, verify:
+> - **TDD Compliance**: Tests written before implementation (check git history), proper RED-GREEN-REFACTOR cycle
+> - **Test Metadata**: All test files have @requirement, @task, @created, @author headers
+> - **Coverage Analysis**: Unit tests cover all public APIs, integration tests cover critical flows, error paths tested
+> - **Test Quality**: Tests verify behavior (not mocks), descriptive names, no fragile tests, appropriate use of fixtures
+> - **Organization**: Tests in `tests/requirements/YYYY-MM-DD-name/` with unit/integration structure, tasks.md updated, test.sh passes
+> - **Execution Verification**: All tests passing, no flaky tests, execution time documented
+>
+> **Critical test violations:**
+> - TDD violations (tests written after implementation) → Return to implementer
+> - Missing tests for critical security/auth logic → Block merge
+> - Zero test coverage for core functionality → Block merge
+
    - Look for potential security vulnerabilities or performance issues
 
 3. **Architecture and Design Review**:

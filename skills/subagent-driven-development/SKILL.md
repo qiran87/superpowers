@@ -43,15 +43,6 @@ digraph when_to_use {
   - Details: Task completion summary, files modified, test results
   - Next: {next-step}
 ```
-- [ ] Use `mcp__spec-workflow__log-implementation` if spec-workflow MCP server is configured:
-  - specName: Current requirement/spec name
-  - taskId: Task number
-  - summary: Brief description of what was implemented
-  - filesModified: List of modified files
-  - filesCreated: List of created files
-  - statistics: { linesAdded, linesRemoved }
-  - artifacts: Structured data about implemented artifacts
-```
 
 ## The Process
 

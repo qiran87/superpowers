@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "spec-workflow": {
-      "command": "npx -y @modelcontext/serve-server",
-      "args": ["${workspaceFolder}/.spec-workflow"],
-      "disabled": false
-    }
-  }
-}

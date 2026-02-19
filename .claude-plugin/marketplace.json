@@ -14,7 +14,26 @@
       "author": {
         "name": "Jesse Vincent",
         "email": "jesse@fsck.com"
-      }
+      },
+      "skills": [
+      "./skills/brainstorming",
+      "./skills/code-structure-reader",
+      "./skills/design-with-existing-modules",
+      "./skills/dispatching-parallel-agents",
+      "./skills/executing-plans",
+      "./skills/finishing-a-development-branch",
+      "./skills/protocol-compliance-check",
+      "./skills/receiving-code-review",
+      "./skills/requesting-code-review",
+      "./skills/subagent-driven-development",
+      "./skills/systematic-debugging",
+      "./skills/test-driven-development",
+      "./skills/using-git-worktrees",
+      "./skills/using-superpowers",
+      "./skills/verification-before-completion",
+      "./skills/writing-plans",
+      "./skills/writing-skills"
+      ]
     }
   ]
 }

@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+description: "You MUST use this before any creative work. Explores user intent, requirements and design before implementation. MUST check if docs/project-analysis/ exists and read relevant documents (01-frontend-components.md, 02-backend-apis.md, etc.) to understand existing modules."
 ---
 
 # Brainstorming Ideas Into Designs
@@ -66,14 +66,28 @@ questions:
    - 11-quality-reports.md (Technical debt + security)
    - 12-interaction-index.md (Navigation index)
 
-4. After completion, announce: "✅ Documentation analysis complete! Generated 12 comprehensive documents at `docs/project-analysis/`. I'll use this fresh context to inform our design discussion."
+4. **⚠️ MANDATORY: Read the generated documents before proceeding**
+   - Read `docs/project-analysis/00-overview.md` to understand project context
+   - Read `docs/project-analysis/01-frontend-components.md` for existing components
+   - Read `docs/project-analysis/02-backend-apis.md` for existing APIs
+   - Read `docs/project-analysis/03-backend-domains.md` for domain models
+   - Read `docs/project-analysis/06-external-apis.md` if design involves external services
 
-5. Proceed to "Understanding the idea" section with updated context
+5. Announce: "✅ Documentation analysis complete! Generated 12 comprehensive documents at `docs/project-analysis/`. I've read the key documents and will use this context to inform our design discussion."
+
+6. Proceed to "Understanding the idea" section with updated context
 
 **If user selects "Documentation is current":**
 
-- Skip code analysis
-- Proceed directly to "Understanding the idea" section
+> **⚠️ MANDATORY: Still need to read the documents before proceeding**
+
+- Read `docs/project-analysis/00-overview.md` to understand project context
+- Read `docs/project-analysis/01-frontend-components.md` for existing components
+- Read `docs/project-analysis/02-backend-apis.md` for existing APIs
+- Read `docs/project-analysis/03-backend-domains.md` for domain models
+- Read `docs/project-analysis/06-external-apis.md` if design involves external services
+
+- Proceed to "Understanding the idea" section
 - Use existing documentation for context
 
 **If user selects "Not sure":**

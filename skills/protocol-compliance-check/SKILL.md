@@ -1,6 +1,6 @@
 ---
 name: protocol-compliance-check
-description: Use when reviewing code implementation against design documentation to verify compliance with protocol specifications, detect undefined fields, frontend-backend mismatches, and database schema violations
+description: Use when reviewing code implementation. MUST READ docs/project-analysis/02-backend-apis.md, 03-backend-domains.md, 04-database-schemas.md BEFORE starting. Verify compliance with protocol specifications, detect undefined fields, frontend-backend mismatches, and database schema violations
 ---
 
 # Protocol Compliance Check
@@ -126,12 +126,23 @@ fi
 ```
 
 **Read Protocol Documents:**
-1. Find latest design document: `docs/plans/*-design.md`
-2. Read API definitions: `docs/project-analysis/02-backend-apis.md`
-3. Read domain models: `docs/project-analysis/03-backend-domains.md`
-4. Read database schema: `docs/project-analysis/04-database-schemas.md`
-5. Read external APIs: `docs/project-analysis/06-external-apis.md` (if code uses external services)
-6. Read code relations: `docs/project-analysis/08-code-relations.md`
+
+> **⚠️ MANDATORY: Execute these steps in order before proceeding**
+
+> **Step 0:** Verify documentation exists (using the check above)
+
+> **Step 1:** Read the core protocol documents:
+> - Read `docs/project-analysis/02-backend-apis.md`
+> - Read `docs/project-analysis/03-backend-domains.md`
+> - Read `docs/project-analysis/04-database-schemas.md`
+
+> **Step 2:** If code uses external services, also read:
+> - Read `docs/project-analysis/06-external-apis.md`
+
+> **Step 3:** For dependency analysis, read:
+> - Read `docs/project-analysis/08-code-relations.md`
+
+> **⚠️ DO NOT PROCEED until all relevant documents have been read**
 
 ### Step 2: Extract Code Implementation
 

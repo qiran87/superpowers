@@ -1,9 +1,31 @@
 ---
 name: systematic-debugging
-description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
+description: |
+  Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes.
+  Also triggers for: 定位问题, 找原因, 排查故障, 分析错误, 调试代码, 帮我debug, 定位并修复,
+  "why is this happening", "help me debug", "find the issue", "investigate problem", "troubleshoot"
 ---
 
 # Systematic Debugging
+
+## Mode Detection
+
+> **⚠️ IMPORTANT: Check user intent before proceeding**
+>
+> **If user message contains phrases like:**
+> - "告诉我，并让我判断"
+> - "告诉我结果，我来决定"
+> - "分析一下，不要改"
+> - "只分析，不执行"
+> - "先看看，别动"
+>
+> **ENTER ANALYSIS-ONLY MODE:**
+> - Execute Phase 1 (Root Cause Investigation) and Phase 2 (Pattern Analysis) only
+> - Present findings and analysis to user
+> - **DO NOT** proceed to Phase 3 (Hypothesis) or Phase 4 (Implementation)
+> - Ask user: "已完成根因分析，以上是我的发现。您希望我继续修复吗？"
+>
+> **Otherwise:** Proceed with full debugging process (Phases 1-4)
 
 ## Overview
 
@@ -167,7 +189,30 @@ You MUST complete each phase before proceeding to the next.
    - Ask for help
    - Research more
 
-### Phase 4: Implementation
+### Phase 4: Implementation (Max 7 Attempts)
+
+> **🔄 Debugging Loop Counter:**
+>
+> **Track your fix attempts:**
+> - Each full cycle through Steps 1-4 = 1 attempt
+> - Maintain counter across the debugging session
+> - **Maximum 7 attempts** before questioning architecture
+>
+> **Loop Structure:**
+> ```
+> attempt = 0
+> while attempt < 7:
+>     attempt += 1
+>     Phase 1-2: 定位问题 (根因 + 模式分析)
+>     Phase 3: 假设验证
+>     Phase 4 Steps 1-4: 实施修复
+>         → test-driven-development (RED → GREEN)
+>         → verification-before-completion
+>         → If verification passes: SUCCESS ✅
+>         → If verification fails: continue loop
+>
+> If attempt == 7: STOP, question architecture
+> ```
 
 **Fix the root cause, not the symptom:**
 
@@ -189,28 +234,46 @@ You MUST complete each phase before proceeding to the next.
    - No other tests broken?
    - Issue actually resolved?
 
-4. **If Fix Doesn't Work**
+4. **Use verification-before-completion**
+   > **⚠️ MANDATORY BEFORE CLAIMING SUCCESS:**
+   >
+   > Use **superpowers:verification-before-completion** to verify the fix:
+   > - Run verification command (test, curl, Python script, etc.)
+   > - Confirm output shows fix is working
+   > - Only claim success after verification with evidence
+   >
+   > **Verification methods:**
+   > - Test framework: `npm test`, `pytest`
+   > - HTTP/API: `curl -X POST http://localhost:3000/api/...`
+   > - Python script: `python verify_fix.py`
+   > - Shell command: Any command that proves the fix
+
+5. **If Fix Doesn't Work**
    - STOP
-   - Count: How many fixes have you tried?
-   - If < 3: Return to Phase 1, re-analyze with new information
-   - **If ≥ 3: STOP and question the architecture (step 5 below)**
-   - DON'T attempt Fix #4 without architectural discussion
+   - Count: How many fixes have you tried? (include current attempt in count)
+   - If < 7: Return to Phase 1, re-analyze with new information
+   - **If ≥ 7: STOP and question the architecture (step 6 below)**
+   - DON'T attempt Fix #8 without architectural discussion
 
-5. **If 3+ Fixes Failed: Question Architecture**
+6. **If 7+ Fixes Failed: Question Architecture**
 
-   **Pattern indicating architectural problem:**
-   - Each fix reveals new shared state/coupling/problem in different place
-   - Fixes require "massive refactoring" to implement
-   - Each fix creates new symptoms elsewhere
-
-   **STOP and question fundamentals:**
-   - Is this pattern fundamentally sound?
-   - Are we "sticking with it through sheer inertia"?
-   - Should we refactor architecture vs. continue fixing symptoms?
-
-   **Discuss with your human partner before attempting more fixes**
-
-   This is NOT a failed hypothesis - this is a wrong architecture.
+   > **⚠️ CRITICAL: You have reached the maximum debugging attempts**
+   >
+   > **Pattern indicating architectural problem:**
+   > - Each fix reveals new shared state/coupling/problem in different place
+   > - Fixes require "massive refactoring" to implement
+   > - Each fix creates new symptoms elsewhere
+   > - Debugging loop keeps finding new issues instead of resolving
+   >
+   > **STOP and question fundamentals:**
+   > - Is this pattern fundamentally sound?
+   > - Are we "sticking with it through sheer inertia"?
+   > - Should we refactor architecture vs. continue fixing symptoms?
+   > - Is there a missing abstraction that would simplify this?
+   >
+   > **Discuss with your human partner before attempting more fixes**
+   >
+   > **This is NOT a failed hypothesis - this is a wrong architecture.**
 
 ## Red Flags - STOP and Follow Process
 
@@ -224,12 +287,12 @@ If you catch yourself thinking:
 - "Pattern says X but I'll adapt it differently"
 - "Here are the main problems: [lists fixes without investigation]"
 - Proposing solutions before tracing data flow
-- **"One more fix attempt" (when already tried 2+)**
+- **"One more fix attempt" (when already tried 6+)**
 - **Each fix reveals new problem in different place**
 
 **ALL of these mean: STOP. Return to Phase 1.**
 
-**If 3+ fixes failed:** Question the architecture (see Phase 4.5)
+**If 7+ fixes failed:** Question the architecture (see Phase 4, Step 6)
 
 ## your human partner's Signals You're Doing It Wrong
 
@@ -253,7 +316,7 @@ If you catch yourself thinking:
 | "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
 | "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
 | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
-| "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don't fix again. |
+| "One more fix attempt" (after 6+ failures) | 7+ failures = architectural problem. Question pattern, don't fix again. |
 
 ## Quick Reference
 

@@ -74,6 +74,21 @@ When multiple skills could apply, use this order:
 "Let's build X" → brainstorming first, then implementation skills.
 "Fix this bug" → debugging first, then domain-specific skills.
 
+## Common Scenarios
+
+**调试相关场景 (Debugging):**
+- 发现 bug、定位问题、排查故障 → systematic-debugging
+- "帮我debug"、"找原因"、"分析错误" → systematic-debugging
+- 修复完成后 → verification-before-completion
+
+**设计相关场景 (Design):**
+- 新建功能、添加特性、修改行为 → brainstorming
+- 技术方案设计 → design-with-existing-modules
+
+**实施相关场景 (Implementation):**
+- 执行实施计划 → subagent-driven-development 或 executing-plans
+- 任何功能实现或 bugfix → test-driven-development
+
 ## Skill Types
 
 **Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.

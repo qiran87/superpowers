@@ -151,6 +151,15 @@ Whether documentation was updated or not, proceed to the "Understanding the idea
 > - What are the transaction boundaries and isolation levels?
 
 > **API Design:**
+> - **输出格式要求:** 必须为每个新/修改的 API 提供以下格式:
+>   ```markdown
+>   #### METHOD /api/资源名
+>   **描述:** 操作说明
+>   **请求:** `{字段: 类型, ...}`
+>   **响应:** `{字段: 类型, ...}`
+>   **错误码:** 列表
+>   ```
+> - **同步要求:** 设计完成后必须将此部分内容同步到 `docs/project-analysis/02-backend-apis.md`
 > - What are the endpoints and contracts?
 > - What are the authentication and authorization mechanisms?
 > - What are the error codes and response formats?

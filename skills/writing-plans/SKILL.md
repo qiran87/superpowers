@@ -49,10 +49,37 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 ```markdown
 ### Task N: [Component Name]
 
+**Protocol Documentation Reference:**
+> **⚠️ CRITICAL: Implementer MUST verify against these documents BEFORE coding**
+>
+> **Required reading:**
+> - API Definitions: `docs/project-analysis/02-backend-apis.md`
+> - Domain Models: `docs/project-analysis/03-backend-domains.md`
+> - Database Schema: `docs/project-analysis/04-database-schemas.md`
+>
+> **What to verify:**
+> - ✅ Field names: Use `symbol` (not `ts_code`), `email` (not `username`)
+> - ✅ API paths: Use `/api/users/:id/profile` (not `/api/user/profile`)
+> - ✅ Request/response: Match protocol structure exactly
+> - ✅ Database: Column names and types match schema
+>
+> **If documentation doesn't exist:**
+> 1. Use `superpowers:code-structure-reader` to generate it first
+> 2. Wait for generation to complete
+> 3. Read the generated documents
+> 4. Then proceed with implementation
+
 **Files:**
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py:123-145`
 - Test: `tests/exact/path/to/test.py`
+
+**Step 0: Verify protocol compliance (MANDATORY)**
+> BEFORE writing any code:
+> 1. Read the protocol documents listed above
+> 2. Verify all field names, API paths, structures
+> 3. Document: "Field X is named 'symbol' in protocol"
+> 4. Only then proceed to Step 1
 
 **Step 1: Write the failing test**
 

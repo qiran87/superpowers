@@ -1,6 +1,9 @@
 ---
 name: test-driven-development
-description: Use when implementing any feature or bugfix, before writing implementation code
+description: |
+  Use when implementing any feature or bugfix, before writing implementation code.
+  Always check protocol documentation first: verify field names, API paths, and structures match docs/project-analysis/ before writing tests.
+  Also triggers for: 字段对齐, 接口对齐, 协议验证, 检查字段名, API路径检查, 新增字段, 修改字段, 协议变更
 ---
 
 # Test-Driven Development (TDD)
@@ -69,6 +72,147 @@ digraph tdd_cycle {
 ```
 
 ### RED - Write Failing Test
+
+**Step 0: Verify Protocol Compliance (MANDATORY CHECKPOINT)**
+
+> **⚠️ CRITICAL: Do NOT write any test code until this step is complete.**
+>
+> **Before writing test, you MUST:**
+>
+> 1. **Check if protocol documentation exists:**
+>    ```bash
+>    # Verify required documents exist
+>    ls docs/project-analysis/02-backend-apis.md
+>    ls docs/project-analysis/03-backend-domains.md
+>    ls docs/project-analysis/04-database-schemas.md
+>    ```
+>
+> 2. **If documents exist, read them and verify:**
+>    - ✅ Field names match protocol (e.g., use `symbol`, NOT `ts_code`)
+>    - ✅ API paths match protocol (e.g., `/api/users/:id/profile`, NOT `/api/user/profile`)
+>    - ✅ Request/response structures match protocol
+>    - ✅ Database columns match schema
+>
+> 3. **If documents DO NOT exist:**
+>    ```bash
+>    # STOP! Generate protocol documentation first
+>    Use Skill tool: superpowers:code-structure-reader
+>    ```
+>    - Wait for code-structure-reader to complete
+>    - Then read the generated documents
+>    - Proceed with verification
+>
+> **🔍 PROTOCOL CHANGE DETECTION:**
+>
+> Before writing test, ask yourself:
+> - Is this test using NEW fields not currently in the protocol?
+> - Is this test MODIFYING existing field definitions?
+> - Is this test CHANGING the API structure?
+>
+> **If ANY YES → This is a PROTOCOL CHANGE:**
+>
+> 1. **STOP writing code immediately**
+>
+> 2. **Read current protocol documentation:**
+>    ```bash
+>    # Read to understand existing format
+>    Read docs/project-analysis/02-backend-apis.md
+>    ```
+>
+> 3. **Update protocol documentation using Edit tool:**
+>    ```markdown
+>    # Find the relevant API/Entity section in the file
+>    # Add the new/modified field in the correct format
+>
+>    ## [Entity/API Name]
+>
+>    ### [field_name] [NEW YYYY-MM-DD]
+>    - **Type:** string | number | boolean | etc.
+>    - **Description:** Field description
+>    - **Required:** true | false
+>    - **Example:** Example value
+>    ```
+>
+>    **For NEW field:**
+>    ```markdown
+>    ### avatar [NEW 2025-02-26]
+>    - **Type:** string
+>    - **Description:** User avatar URL
+>    - **Required:** false
+>    ```
+>
+>    **For MODIFIED field:**
+>    ```markdown
+>    ### email [MODIFIED 2025-02-26]
+>    - **Required:** false (was: true)
+>    - **Change:** Made optional for social login
+>    ```
+>
+> 4. **Verify frontend-backend alignment:**
+>    - Frontend uses: `field_name`
+>    - Backend provides: `field_name`
+>    - Protocol defines: `field_name`
+>    - All three MUST match exactly
+>
+> 5. **Present changes to user for confirmation:**
+>    ```markdown
+>    **协议变更检测：**
+>
+>    检测到需要修改协议文档：
+>    - 变更类型: [NEW/MODIFIED]
+>    - 字段名称: field_name
+>    - 更新位置: docs/project-analysis/02-backend-apis.md
+>
+>    已更新协议文档，前后端使用字段: `field_name`
+>
+>    请确认是否继续？
+>    ```
+>
+> 6. **Only after user confirms:** Continue to Step 1
+>
+> **Protocol change examples:**
+>
+> **Scenario 1: Adding a new field**
+> ```typescript
+> // ❌ WRONG: Just write test with new field
+> test('user has avatar', () => {
+>   expect(user.avatar).toBe('url');
+> });
+>
+> // ✅ RIGHT: Update protocol first
+> // 1. Update docs/project-analysis/02-backend-apis.md
+> // 2. Add: [NEW FIELD] avatar: string
+> // 3. Then write test
+> ```
+>
+> **Scenario 2: Changing field name**
+> ```typescript
+> // ❌ WRONG: Use different field name in test
+> test('user profile', () => {
+>   expect(user.fullName).toBe('John');  // protocol says firstName + lastName
+> });
+>
+> // ✅ RIGHT: Update protocol first
+> // 1. Update docs/project-analysis/03-backend-domains.md
+> // 2. Mark: [MODIFIED date] fullName replaced firstName + lastName
+> // 3. Then write test
+> ```
+>
+> 4. **Document your findings:**
+>    - "According to docs/project-analysis/02-backend-apis.md, the field name is `symbol`"
+>    - "API endpoint is GET /api/stocks/:symbol"
+>
+> **Only after completing Step 0:** Proceed to Step 1
+>
+> **Common mistakes to avoid:**
+> - ❌ Using field names from other contexts (e.g., `ts_code` from legacy code)
+> - ❌ Assuming API paths without checking documentation
+> - ❌ Guessing database column names
+> - ❌ Skipping this step to "save time"
+> - ❌ **Adding new fields without updating protocol**
+> - ❌ **Modifying fields without marking in protocol**
+
+**Step 1: Write the failing test**
 
 Write one minimal test showing what should happen.
 

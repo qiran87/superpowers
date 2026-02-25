@@ -200,6 +200,93 @@ Whether documentation was updated or not, proceed to the "Understanding the idea
 > - Maintain existing architecture, optimize existing implementation
 > - Does not involve system-level design changes
 > - Can be completed within single service
+>
+> **⚠️ PROTOCOL CHANGE CHECK for Small Changes:**
+>
+> **Before finalizing small requirement designs, check:**
+>
+> **1. Does this change involve protocol modifications?**
+> - New fields in API request/response?
+> - Modified field types or names?
+> - New/modified API endpoints?
+> - Database schema changes?
+>
+> **2. If YES → Protocol Change Required:**
+>
+> **Step-by-Step Update Process:**
+>
+> **Step 1: Read current protocol**
+> ```bash
+> Read docs/project-analysis/02-backend-apis.md
+> ```
+>
+> **Step 2: Update using Edit tool**
+> ```markdown
+> ## [API Name]
+>
+> ### [field_name] [NEW/MODIFIED/YYYY-MM-DD]
+> - **Type:** string | number | boolean | object | array
+> - **Description:** What this field represents
+> - **Required:** true | false
+> - **Constraints:** Any validation rules
+> - **Example:** Example value
+>
+> **For NEW field example:**
+> ### avatar [NEW 2025-02-26]
+> - **Type:** string
+> - **Description:** User avatar URL
+> - **Required:** false
+> - **Constraints:** Must be valid URL
+> - **Example:** "https://example.com/avatar.jpg"
+>
+> **For MODIFIED field example:**
+> ### email [MODIFIED 2025-02-26]
+> - **Required:** false (changed from: true)
+> - **Reason:** Support social login without email
+> ```
+>
+> **Step 3: Verify format consistency**
+> - Match existing field format in the document
+> - Use same indentation and style
+> - Include in correct section (Request/Response)
+>
+> **Step 4: Frontend-Backend Alignment Verification**
+>
+> Create and present alignment checklist:
+> ```markdown
+> **Frontend-Backend Alignment:**
+> - Field name: `avatar`
+>   - Frontend uses: avatar ✅
+>   - Backend provides: avatar ✅
+>   - Protocol defines: avatar ✅
+>   - All three match: YES ✅
+> ```
+>
+> **Step 5: Document and confirm**
+> - State clearly: "协议变更: 新增字段 avatar"
+> - Mark in design document: `[PROTOCOL CHANGE]`
+> - Ask user: "前后端字段已对齐，使用 `avatar`，是否确认继续？"
+>
+> **3. Summary Update Process:**
+> - Use Edit tool to modify `docs/project-analysis/02-backend-apis.md`
+> - Mark changes with [NEW], [MODIFIED date], or [DEPRECATED]
+> - If changing existing field: document breaking change impact
+> - Verify frontend and backend design sections reference same field names
+> - Present alignment checklist to user for confirmation
+>
+> **4. Communication:**
+> - Explicitly state: "协议变更: 字段 X 是 [NEW/MODIFIED]"
+> - Present alignment checklist with field names
+> - Ask: "前后端已对齐，都使用 `field_name`，是否确认？"
+>
+> **5. If NO protocol change:**
+> - Proceed with standard small change process
+>
+> **Common mistakes to avoid:**
+> - ❌ Adding field in backend but not updating protocol
+> - ❌ Frontend uses `avatar_url` while backend provides `avatar`
+> - ❌ Changing field type without marking [MODIFIED]
+> - ❌ Forgetting to update 02-backend-apis.md after design
 
 **Part 2B: Frontend Technical Design (for frontend team)**
 

@@ -105,7 +105,8 @@ digraph protocol_compliance {
 | **Backend APIs** | `docs/project-analysis/02-backend-apis.md` | API endpoints, request/response formats |
 | **Domain Models** | `docs/project-analysis/03-backend-domains.md` | Entities, aggregates, business logic |
 | **Database Schema** | `docs/project-analysis/04-database-schemas.md` | Tables, columns, relationships |
-| **Code Relations** | `docs/project-analysis/07-code-relations.md` | Dependencies, call chains, data flows |
+| **External APIs** | `docs/project-analysis/06-external-apis.md` | External services, adapters, field mappings |
+| **Code Relations** | `docs/project-analysis/08-code-relations.md` | Dependencies, call chains, data flows |
 
 ## Implementation
 
@@ -129,7 +130,8 @@ fi
 2. Read API definitions: `docs/project-analysis/02-backend-apis.md`
 3. Read domain models: `docs/project-analysis/03-backend-domains.md`
 4. Read database schema: `docs/project-analysis/04-database-schemas.md`
-5. Read code relations: `docs/project-analysis/07-code-relations.md`
+5. Read external APIs: `docs/project-analysis/06-external-apis.md` (if code uses external services)
+6. Read code relations: `docs/project-analysis/08-code-relations.md`
 
 ### Step 2: Extract Code Implementation
 
@@ -386,6 +388,199 @@ SELECT * FROM user_logs  -- ❌ table user_logs not defined
 - Compare against schema definitions
 - Validate: tables exist, columns exist, types match
 - Report: Schema violations with query location
+
+### Bad Case 4: External Field Inconsistency (CRITICAL)
+
+**Definition:** 直接使用外部接口的字段，没有通过适配器层统一处理，导致内部系统字段不一致。
+
+**场景描述:**
+当调用外部服务的不同接口时，外部接口返回的字段命名不一致：
+- 外部接口 A 返回: `{ n: "value" }`
+- 外部接口 B 返回: `{ name: "value" }`
+- 外部服务无法修改接口
+- 服务端代码中一边存 `name`，另一边存 `n`
+
+**检测规则:**
+```
+for each code file:
+    external_api_calls = extract_external_api_calls()
+
+    for call in external_api_calls:
+        if direct_external_field_usage(call):
+            report_violation("CRITICAL", "External field used directly without adapter")
+
+def direct_external_field_usage(call):
+    # 检查是否直接使用外部响应的字段
+    return (
+        "external_field" in call.usage and
+        "adapter" not in call.usage
+    )
+```
+
+**示例:**
+
+**Wrong (直接使用外部字段):**
+```typescript
+// ❌ 直接使用外部接口 A 的字段
+class UserService {
+    async getUserFromAPI_A() {
+        const response = await fetch('https://api-a.com/user');
+        const user = await response.json();
+        // ❌ 直接使用外部字段 n
+        return { name: user.n };
+    }
+
+    // ❌ 直接使用外部接口 B 的字段
+    async getUserFromAPI_B() {
+        const response = await fetch('https://api-b.com/user');
+        const user = await response.json();
+        // ❌ 使用不同的字段名
+        return { name: user.name };
+    }
+
+    // 结果：数据库中同时存在 name 和 n，字段不一致！
+}
+```
+
+**Right (通过适配器层):**
+```typescript
+// ✅ 适配器层 - 处理字段映射
+class UserAdapterService {
+    async getUserFromAPI_A() {
+        const externalUser = await externalAPI_A.getUser();
+        // 字段映射: n → name
+        return {
+            name: externalUser.n,
+            externalId: externalUser.id
+        };
+    }
+
+    async getUserFromAPI_B() {
+        const externalUser = await externalAPI_B.getUser();
+        // 字段映射: name → name (无需转换)
+        return {
+            name: externalUser.name,
+            externalId: externalUser.id
+        };
+    }
+}
+
+// ✅ 统一的内部接口
+class UserService {
+    constructor(private adapter: UserAdapterService) {}
+
+    async getUser(source: 'api-a' | 'api-b', externalId: string) {
+        // 统一的内部字段: name
+        return await this.adapter.getUser(source, externalId);
+    }
+}
+```
+
+**检测方法:**
+
+1. **识别外部 API 调用**
+   - HTTP 请求: `fetch`, `axios`, `http` (外部 URL)
+   - 第三方 SDK: 调用外部服务的客户端库
+   - API 客户端: 外部服务的 SDK
+
+2. **检查字段使用**
+   - 直接使用外部响应的字段: `response.externalField`
+   - 没有经过适配器层的字段映射
+
+3. **验证适配器层**
+   - 是否有 `adapter`, `mapper`, `transform` 类/函数
+   - 是否在 `docs/project-analysis/06-external-apis.md` 中记录了外部服务
+   - 是否在 `docs/project-analysis/02-backend-apis.md` 中记录了适配器接口
+
+4. **报告违规**
+   - 位置: 文件:行号
+   - 严重程度: CRITICAL
+   - 建议: "创建适配器层处理外部字段映射"
+
+**文档要求:**
+
+**1. 外部接口文档: `docs/project-analysis/06-external-apis.md`**
+
+```markdown
+## [External Service Name]
+
+**Base URL:** `https://api.example.com`
+
+**Authentication:** API Key / OAuth 2.0
+
+**Endpoints:**
+| Method | Path | Purpose | Request Fields | Response Fields |
+|--------|------|---------|----------------|-----------------|
+| GET | `/api/users/:id` | Get user | `id` | `n`, `id` |
+
+**Field Mapping (External → Internal):**
+| External Field | Internal Field | Type | Transformation |
+|----------------|----------------|------|----------------|
+| `n` | `name` | string | Direct mapping |
+| `id` | `externalId` | string | Rename to avoid collision |
+```
+
+**2. 内部适配器接口: `docs/project-analysis/02-backend-apis.md`**
+
+```markdown
+## External API Adapters
+
+### UserAdapter
+**Purpose:** 统一外部用户接口字段，隔离外部系统变化
+
+**Internal Schema:**
+```json
+{
+  "name": "string",
+  "externalId": "string"
+}
+```
+
+**Field Mappings:**
+| Source | External Field | Internal Field | Notes |
+|--------|---------------|----------------|-------|
+| External API A | `n` | `name` | Direct mapping |
+| External API A | `id` | `externalId` | Rename to avoid collision |
+| External API B | `name` | `name` | No transformation |
+| External API B | `id` | `externalId` | Rename to avoid collision |
+
+**Implementation:** `src/adapters/UserAdapterService.ts`
+```
+
+**常见错误模式:**
+
+❌ **错误 1: 在不同接口使用不同处理**
+```typescript
+// 接口 A
+const nameA = externalUserA.n;
+// 接口 B
+const nameB = externalUserB.name;
+// → 内部系统字段不统一！
+```
+
+❌ **错误 2: 在多处重复映射逻辑**
+```typescript
+// 重复的映射逻辑散落在各处
+const name1 = externalUser1.n;
+const name2 = externalUser2.n;
+// → 映射逻辑不统一，难以维护
+```
+
+❌ **错误 3: 数据库中同时存在不一致的字段**
+```typescript
+// 存储时没有统一
+await db.save({ name: valueFromA });    // 来自接口 A
+await db.save({ n: valueFromB });       // 来自接口 B
+// → 数据库中既有 name 又有 n，混乱！
+```
+
+✅ **正确: 统一的适配器层**
+```typescript
+// 所有外部接口都通过适配器
+const user = await adapter.getUser(source, id);
+const name = user.name;  // 统一使用内部字段
+await db.save({ name, externalId });  // 统一存储
+```
 
 ## Common Mistakes
 

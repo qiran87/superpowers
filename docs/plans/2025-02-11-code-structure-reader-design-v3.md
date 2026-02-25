@@ -83,11 +83,11 @@
 | **交互性** | 静态文档 | 交互式智能索引 ⭐ |
 | **技术栈** | 通用 | 针对性分析(前端/后端特有模式) |
 | **本地化** | 英文为主 | 中文友好 |
-| **开发指南** | ❌ 无 | ✅ 06-dev-guide.md(启动/构建/调试) |
+| **开发指南** | ❌ 无 | ✅ 07-dev-guide.md(启动/构建/调试) |
 | **依赖管理** | 基础列表 | ✅ 05-third-party-deps.md(含安全审计) |
-| **测试策略** | ❌ 无 | ✅ 09-testing-strategy.md(覆盖率+工具链) |
-| **安全扫描** | ❌ 无 | ✅ 10-quality-reports.md(含安全+技术债务) |
-| **问答入口** | ❌ 无 | ✅ 11-interaction-index.md(智能导航) |
+| **测试策略** | ❌ 无 | ✅ 10-testing-strategy.md(覆盖率+工具链) |
+| **安全扫描** | ❌ 无 | ✅ 11-quality-reports.md(含安全+技术债务) |
+| **问答入口** | ❌ 无 | ✅ 12-interaction-index.md(智能导航) |
 
 **v3版本核心优化**:
 - ✅ 从14个文件精简到11个文件(-21%)
@@ -132,23 +132,24 @@ docs/project-analysis/
 ├── 03-backend-domains.md       # 🏢 领域模型说明
 ├── 04-database-schemas.md      # 🗄️ 数据库表结构
 ├── 05-third-party-deps.md      # 📦 第三方依赖清单
-├── 06-dev-guide.md            # 🚀 开发指南(启动/构建/调试)
-├── 07-code-relations.md       # 🔗 代码关系全景(依赖+调用+数据流) ⭐合并
-├── 08-architecture-patterns.md # 🏗️ 架构模式分析
-├── 09-testing-strategy.md      # 🧪 测试策略
-├── 10-quality-reports.md       # 📊 质量&安全报告(技术债务+安全风险) ⭐合并
-└── 11-interaction-index.md    # 💬 交互式问答索引 ⭐新增
+├── 06-external-apis.md         # 🌐 外部服务接口 ⭐新增
+├── 07-dev-guide.md            # 🚀 开发指南(启动/构建/调试)
+├── 08-code-relations.md       # 🔗 代码关系全景(依赖+调用+数据流) ⭐合并
+├── 09-architecture-patterns.md # 🏗️ 架构模式分析
+├── 10-testing-strategy.md      # 🧪 测试策略
+├── 11-quality-reports.md       # 📊 质量&安全报告(技术债务+安全风险) ⭐合并
+└── 12-interaction-index.md    # 💬 交互式问答索引
 ```
 
 **文件合并说明**:
-- **07-code-relations.md**: 合并了原 07-dependencies + 08-call-chains + 09-data-flows
-- **10-quality-reports.md**: 合并了原 12-tech-debts + 13-security-risks
+- **08-code-relations.md**: 合并了原 07-dependencies + 08-call-chains + 09-data-flows
+- **11-quality-reports.md**: 合并了原 12-tech-debts + 13-security-risks
 
 **优势**:
 1. **语义聚合**: 相关内容在同一文件,避免跳转
 2. **维护简化**: 修改代码时,更新3个关联文档即可
 3. **全局视角**: 技术债务和安全风险统一考虑,便于重构决策
-4. **新增交互**: 11-interaction-index.md 作为问答入口,降低学习曲线
+4. **新增交互**: 12-interaction-index.md 作为问答入口,降低学习曲线
 
 ---
 
@@ -167,15 +168,15 @@ docs/project-analysis/
 | 变更类型 | 自动更新的文件 |
 |----------|-----------------|
 | 修改前端组件 | `01-frontend-components.md` |
-| 修改API路由 | `02-backend-apis.md` + `07-code-relations.md` |
-| 修改领域逻辑 | `03-backend-domains.md` + `07-code-relations.md` |
+| 修改API路由 | `02-backend-apis.md` + `08-code-relations.md` |
+| 修改领域逻辑 | `03-backend-domains.md` + `08-code-relations.md` |
 | 修改数据库/模型 | `04-database-schemas.md` |
-| 修改package.json | `05-third-party-deps.md` + `10-quality-reports.md` |
-| 修改配置/脚本 | `06-dev-guide.md` |
-| **修改代码逻辑** | **`07-code-relations.md`** (3合1,统一更新) |
-| 修改测试文件 | `09-testing-strategy.md` |
-| 架构调整 | `08-architecture-patterns.md` |
-| 质量/安全问题 | `10-quality-reports.md` (2合1,统一视角) |
+| 修改package.json | `05-third-party-deps.md` + `11-quality-reports.md` |
+| 修改配置/脚本 | `07-dev-guide.md` |
+| **修改代码逻辑** | **`08-code-relations.md`** (3合1,统一更新) |
+| 修改测试文件 | `10-testing-strategy.md` |
+| 架构调整 | `09-architecture-patterns.md` |
+| 质量/安全问题 | `11-quality-reports.md` (2合1,统一视角) |
 
 ---
 
@@ -189,9 +190,9 @@ docs/project-analysis/
 - ✅ Level 1: 目录结构分析
 - ✅ Level 2: 模块依赖分析
 - ✅ 生成核心文档文件(00-06)
-- ✅ **新增**: 07-code-relations.md (基础依赖关系)
+- ✅ **新增**: 08-code-relations.md (基础依赖关系)
 - ✅ 基础可视化(Mermaid树状图)
-- ✅ **新增**: 06-dev-guide.md (新人快速上手)
+- ✅ **新增**: 07-dev-guide.md (新人快速上手)
 
 **预期交付时间**: 1-2周
 
@@ -211,8 +212,8 @@ docs/project-analysis/
 - ✅ Level 4: 数据流分析
 - ✅ 技术栈自动识别
 - ✅ 第三方依赖清单(05-third-party-deps.md)
-- ✅ 依赖关系图更新(扩展07-code-relations.md)
-- ✅ **新增**: 11-interaction-index.md (交互式索引)
+- ✅ 依赖关系图更新(扩展08-code-relations.md)
+- ✅ **新增**: 12-interaction-index.md (交互式索引)
 
 **预期交付时间**: +2-3周
 
@@ -230,8 +231,8 @@ docs/project-analysis/
 **功能范围**:
 - ✅ Level 5: 架构模式识别
 - ✅ 循环依赖检测
-- ✅ 测试策略(09-testing-strategy.md)
-- ✅ 技术债务(10-quality-reports.md前半部分)
+- ✅ 测试策略(10-testing-strategy.md)
+- ✅ 技术债务(11-quality-reports.md前半部分)
 - ✅ 增量更新机制
 
 **预期交付时间**: +2-3周
@@ -249,7 +250,7 @@ docs/project-analysis/
 **目标**: 生产就绪
 
 **功能范围**:
-- ✅ 安全风险扫描(10-quality-reports.md后半部分)
+- ✅ 安全风险扫描(11-quality-reports.md后半部分)
 - ✅ Graphviz复杂图表
 - ✅ 性能优化(并行处理)
 - ✅ 多语言支持(Java/Go/Rust)
@@ -302,8 +303,8 @@ docs/project-analysis/
 3. **保持合理粒度**: 11个文件仍然保持清晰的职责划分
 
 **合并细节**:
-- `07-code-relations.md` = 依赖 + 调用 + 数据流 (3合1)
-- `10-quality-reports.md` = 技术债务 + 安全风险 (2合1)
+- `08-code-relations.md` = 依赖 + 调用 + 数据流 (3合1)
+- `11-quality-reports.md` = 技术债务 + 安全风险 (2合1)
 
 **权衡**:
 - ⚠️ 单个文件可能较长
@@ -312,7 +313,7 @@ docs/project-analysis/
 
 ### ADR-002: 为什么新增交互式索引?
 
-**决策**: 添加 11-interaction-index.md 作为问答入口
+**决策**: 添加 12-interaction-index.md 作为问答入口
 
 **原因**:
 1. **降低学习曲线**: 新人不知道从哪里开始

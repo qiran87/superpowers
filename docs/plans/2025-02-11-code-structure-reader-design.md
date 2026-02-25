@@ -83,9 +83,9 @@
 | **交互性** | 静态文档 | 可提问的智能索引 |
 | **技术栈** | 通用 | 针对性分析(前端/后端特有模式) |
 | **本地化** | 英文为主 | 中文友好 |
-| **开发指南** | ❌ 无 | ✅ 06-dev-guide.md(启动/构建/调试) ⭐ |
+| **开发指南** | ❌ 无 | ✅ 07-dev-guide.md(启动/构建/调试) ⭐ |
 | **依赖管理** | ❌ 无 | ✅ 05-third-party-deps.md(含安全审计) ⭐ |
-| **测试策略** | ❌ 无 | ✅ 11-testing-strategy.md(覆盖率+工具链) ⭐ |
+| **测试策略** | ❌ 无 | ✅ 10-testing-strategy.md(覆盖率+工具链) ⭐ |
 | **安全扫描** | ❌ 无 | ✅ 13-security-risks.md(漏洞+合规性) ⭐ |
 
 ---
@@ -273,15 +273,16 @@ docs/project-analysis/
 ├── 03-backend-domains.md       # 🏢 领域模型说明
 ├── 04-database-schemas.md      # 🗄️ 数据库表结构
 ├── 05-third-party-deps.md      # 📦 第三方依赖清单
-├── 06-dev-guide.md            # 🚀 开发指南(启动/构建/调试)
-├── 07-code-relations.md       # 🔗 代码关系全景(依赖+调用+数据流) ⭐合并
-├── 08-architecture-patterns.md # 🏗️ 架构模式分析
-├── 09-testing-strategy.md      # 🧪 测试策略
-├── 10-quality-reports.md       # 📊 质量&安全报告(技术债务+安全风险) ⭐合并
-└── 11-interaction-index.md    # 💬 交互式问答索引 ⭐新增
+├── 06-external-apis.md         # 🌐 外部服务接口 ⭐新增
+├── 07-dev-guide.md            # 🚀 开发指南(启动/构建/调试)
+├── 08-code-relations.md       # 🔗 代码关系全景(依赖+调用+数据流) ⭐合并
+├── 09-architecture-patterns.md # 🏗️ 架构模式分析
+├── 10-testing-strategy.md      # 🧪 测试策略
+├── 11-quality-reports.md       # 📊 质量&安全报告(技术债务+安全风险) ⭐合并
+└── 12-interaction-index.md    # 💬 交互式问答索引
 ```
 
-**优化说明**: 从14个文件精简到11个文件(-21%)
+**优化说明**: 从14个文件精简到12个文件(-14%)，新增外部API文档
 
 #### 文档内容规范
 
@@ -406,7 +407,7 @@ npm audit```
 - 低危漏洞: 5
 ```
 
-**06-dev-guide.md** ⭐新增:
+**07-dev-guide.md** ⭐新增:
 ```markdown
 # 开发指南
 
@@ -461,7 +462,7 @@ A: 检查防火墙设置,确保端口3000可访问
 ```
 ```
 
-**11-testing-strategy.md** ⭐新增:
+**10-testing-strategy.md** ⭐新增:
 ```markdown
 # 测试策略
 
@@ -599,14 +600,14 @@ npm run test:coverage
    → 13-security-risks.md (安全审计)
 
    修改配置文件/脚本:
-   → 06-dev-guide.md
+   → 07-dev-guide.md
 
    修改测试文件:
-   → 11-testing-strategy.md
+   → 10-testing-strategy.md
 
    大规模重构:
-   → 10-architecture-patterns.md
-   → 12-tech-debts.md
+   → 09-architecture-patterns.md
+   → 11-quality-reports.md
    ```
 
 3. **智能更新策略**:
@@ -804,7 +805,7 @@ ls -d src/*/ | parallel 'analyze-deps {}'
 - ✅ Level 2: 基础依赖分析
 - ✅ 生成核心文档文件(01-04)
 - ✅ 基础可视化(Mermaid树状图)
-- ✅ 开发指南(06-dev-guide.md) ⭐新增
+- ✅ 开发指南(07-dev-guide.md) ⭐新增
 
 ### Phase 2: 核心功能
 - ✅ Level 3: 调用关系分析
@@ -817,9 +818,9 @@ ls -d src/*/ | parallel 'analyze-deps {}'
 ### Phase 3: 高级分析
 - ✅ Level 5: 架构模式识别
 - ✅ 循环依赖检测
-- ✅ 技术债务分析(12-tech-debts.md)
+- ✅ 技术债务分析(11-quality-reports.md)
 - ✅ 增量更新机制
-- ✅ 测试策略(11-testing-strategy.md) ⭐新增
+- ✅ 测试策略(10-testing-strategy.md) ⭐新增
 
 ### Phase 4: 增强功能
 - ✅ Graphviz复杂图表

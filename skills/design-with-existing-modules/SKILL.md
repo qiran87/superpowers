@@ -88,8 +88,10 @@ digraph module_decision {
 | **Domain Models** | `03-backend-domains.md` | Entities, aggregates, business logic |
 | **Database Schemas** | `04-database-schemas.md` | Tables, columns, relationships, indexes |
 | **Third-party Deps** | `05-third-party-deps.md` | Available libraries and frameworks |
-| **Architecture Patterns** | `08-architecture-patterns.md` | Design patterns used in project |
-| **Code Relations** | `07-code-relations.md` | Dependencies, call chains, data flows |
+| **External APIs** | `06-external-apis.md` | External services, adapters, field mappings |
+| **Dev Guide** | `07-dev-guide.md` | Setup, build, debug commands |
+| **Code Relations** | `08-code-relations.md` | Dependencies, call chains, data flows |
+| **Architecture Patterns** | `09-architecture-patterns.md` | Design patterns used in project |
 
 ### Decision Criteria
 
@@ -129,6 +131,7 @@ fi
 - Business logic → Read `03-backend-domains.md`
 - Data persistence → Read `04-database-schemas.md`
 - Libraries → Read `05-third-party-deps.md`
+- **External services** → Read `06-external-apis.md` (check for existing adapters)
 
 ### Step 2: Analyze Requirements vs Existing Modules
 

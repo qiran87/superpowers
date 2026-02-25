@@ -337,9 +337,9 @@ run_baseline_test "Scenario4: 大型项目" "$LARGE_PROJECT_DIR"
 **技能目标** (解决上述问题):
 
 - ✅ 实施五层渐进式分析（Level 1-5）
-- ✅ 按领域环节拆分11个文档
+- ✅ 按领域环节拆分12个文档
 - ✅ 智能增量更新（10个文件阈值）
-- ✅ 交互式问答索引（11-interaction-index.md）
+- ✅ 交互式问答索引（12-interaction-index.md）
 - ✅ 中文友好输出
 
 **实施要点**:

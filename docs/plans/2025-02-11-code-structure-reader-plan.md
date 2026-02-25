@@ -196,7 +196,7 @@ set -e
 
 PROJECT_ROOT=${1:-"."}
 OUTPUT_DIR="docs/project-analysis"
-RELATIONS_FILE="$OUTPUT_DIR/07-code-relations.md"
+RELATIONS_FILE="$OUTPUT_DIR/08-code-relations.md"
 
 echo "🔗 Analyzing module dependencies..."
 
@@ -251,7 +251,7 @@ echo "✅ Level 2 分析完成"
 bash skills/code-structure-reader/level2-dependencies.sh
 
 # 验证输出
-grep -A 10 "依赖矩阵\|依赖关系图" docs/project-analysis/07-code-relations.md
+grep -A 10 "依赖矩阵\|依赖关系图" docs/project-analysis/08-code-relations.md
 # 预期: 包含依赖矩阵表格 + Mermaid图
 ```
 
@@ -275,7 +275,7 @@ graph LR
 \`\`\`
 ```
 
-**完成标准**: 07-code-relations.md 包含依赖矩阵和可视化图
+**完成标准**: 08-code-relations.md 包含依赖矩阵和可视化图
 
 **相关技能**: 无
 
@@ -283,11 +283,11 @@ graph LR
 
 ---
 
-### Task 1.4: 生成06-dev-guide.md 开发指南
+### Task 1.4: 生成07-dev-guide.md 开发指南
 
 **目标**: 为新人提供快速启动指南
 
-**文件**: `docs/project-analysis/06-dev-guide.md` (更新,已创建模板)
+**文件**: `docs/project-analysis/07-dev-guide.md` (更新,已创建模板)
 
 **完整代码**:
 ```bash
@@ -298,7 +298,7 @@ set -e
 
 PROJECT_ROOT=${1:-"."}
 OUTPUT_DIR="docs/project-analysis"
-DEV_GUIDE="$OUTPUT_DIR/06-dev-guide.md"
+DEV_GUIDE="$OUTPUT_DIR/07-dev-guide.md"
 
 echo "📖 Generating development guide..."
 
@@ -370,11 +370,11 @@ echo "✅ 开发指南生成完成"
 bash skills/code-structure-reader/generate-dev-guide.sh
 
 # 验证输出
-grep "环境要求\|快速开始\|常用命令" docs/project-analysis/06-dev-guide.md
+grep "环境要求\|快速开始\|常用命令" docs/project-analysis/07-dev-guide.md
 # 预期: 包含环境、启动步骤、命令表格
 ```
 
-**完成标准**: 06-dev-guide.md 包含完整的新人上手流程
+**完成标准**: 07-dev-guide.md 包含完整的新人上手流程
 
 **相关技能**: 无
 
@@ -416,8 +416,8 @@ echo ""
 echo "✅ MVP 分析完成!"
 echo "📊 生成的文档:"
 echo "  - 00-overview.md (项目概览)"
-echo "  - 06-dev-guide.md (开发指南)"
-echo "  - 07-code-relations.md (依赖关系)"
+echo "  - 07-dev-guide.md (开发指南)"
+echo "  - 08-code-relations.md (依赖关系)"
 echo ""
 echo "📍 查看文档: cat docs/project-analysis/00-overview.md"
 ```
@@ -427,7 +427,7 @@ echo "📍 查看文档: cat docs/project-analysis/00-overview.md"
 bash skills/code-structure-reader/analyze-mvp.sh
 
 # 验证3个文件都生成
-ls docs/project-analysis/00-overview.md docs/project-analysis/06-dev-guide.md docs/project-analysis/07-code-relations.md
+ls docs/project-analysis/00-overview.md docs/project-analysis/07-dev-guide.md docs/project-analysis/08-code-relations.md
 # 预期: 所有文件存在且非空
 ```
 
@@ -493,7 +493,7 @@ set -e
 
 PROJECT_ROOT=${1:-"."}
 OUTPUT_DIR="docs/project-analysis"
-RELATIONS_FILE="$OUTPUT_DIR/07-code-relations.md"
+RELATIONS_FILE="$OUTPUT_DIR/08-code-relations.md"
 
 echo "📞 Analyzing call relationships..."
 
@@ -531,7 +531,7 @@ echo '\`\`\`' >> "$RELATIONS_FILE"
 echo "✅ Level 3 分析完成"
 ```
 
-**完成标准**: 07-code-relations.md 新增"调用链分析"章节
+**完成标准**: 08-code-relations.md 新增"调用链分析"章节
 
 **相关技能**: 无
 
@@ -554,7 +554,7 @@ set -e
 
 PROJECT_ROOT=${1:-"."}
 OUTPUT_DIR="docs/project-analysis"
-RELATIONS_FILE="$OUTPUT_DIR/07-code-relations.md"
+RELATIONS_FILE="$OUTPUT_DIR/08-code-relations.md"
 
 echo "🌊 Analyzing data flow..."
 
@@ -599,7 +599,7 @@ fi
 echo "✅ Level 4 分析完成"
 ```
 
-**完成标准**: 07-code-relations.md 新增"数据流分析"章节
+**完成标准**: 08-code-relations.md 新增"数据流分析"章节
 
 **相关技能**: 无
 
@@ -684,11 +684,11 @@ echo "✅ 依赖清单生成完成"
 
 ---
 
-### Task 2.4: 生成11-interaction-index.md 交互式索引
+### Task 2.4: 生成12-interaction-index.md 交互式索引
 
 **目标**: 创建问答入口,降低学习曲线
 
-**文件**: `docs/project-analysis/11-interaction-index.md` (新建)
+**文件**: `docs/project-analysis/12-interaction-index.md` (新建)
 
 **完整代码**:
 ```bash
@@ -698,7 +698,7 @@ echo "✅ 依赖清单生成完成"
 set -e
 
 OUTPUT_DIR="docs/project-analysis"
-INDEX_FILE="$OUTPUT_DIR/11-interaction-index.md"
+INDEX_FILE="$OUTPUT_DIR/12-interaction-index.md"
 
 echo "💬 Generating interaction index..."
 
@@ -713,7 +713,7 @@ cat > "$INDEX_FILE" << 'EOF'
 ### Q: 我是新人,从哪里开始?
 **A:** 按以下顺序阅读文档:
 1. 先读 [00-overview.md](00-overview.md) 了解项目结构和技术栈
-2. 按照 [06-dev-guide.md](06-dev-guide.md) 安装依赖并启动项目
+2. 按照 [07-dev-guide.md](07-dev-guide.md) 安装依赖并启动项目
 3. 查看 [01-frontend-components.md](01-frontend-components.md) 了解前端组件
 
 ### Q: 遇到问题如何求助?
@@ -742,7 +742,7 @@ cat > "$INDEX_FILE" << 'EOF'
 2. 在对应的领域文件添加业务逻辑
 3. 更新以下文档:
    - [02-backend-apis.md](02-backend-apis.md) - 添加接口说明
-   - [07-code-relations.md](07-code-relations.md) - 更新依赖关系
+   - [08-code-relations.md](08-code-relations.md) - 更新依赖关系
 
 ### Q: 数据库表结构在哪里定义?
 **A:**
@@ -751,7 +751,7 @@ cat > "$INDEX_FILE" << 'EOF'
 - 模型定义: \`src/backend/models/\`
 
 ### Q: 如何运行测试?
-**A:** 参考 [09-testing-strategy.md](09-testing-strategy.md) (待生成)
+**A:** 参考 [10-testing-strategy.md](10-testing-strategy.md) (待生成)
 - 运行全部测试: \`npm test\`
 - 运行单元测试: \`npm run test:unit\`
 - 运行E2E测试: \`npm run test:e2e\`
@@ -769,8 +769,8 @@ cat > "$INDEX_FILE" << 'EOF'
 
 ### Q: 如何重构高风险模块?
 **A:**
-1. 查看 [10-quality-reports.md](10-quality-reports.md) 了解技术债务
-2. 检查 [07-code-relations.md](07-code-relations.md) 的依赖关系
+1. 查看 [11-quality-reports.md](11-quality-reports.md) 了解技术债务
+2. 检查 [08-code-relations.md](08-code-relations.md) 的依赖关系
 3. 评估影响范围,避免破坏性变更
 4. 编写测试用例
 
@@ -788,7 +788,7 @@ EOF
 echo "✅ 交互索引生成完成"
 ```
 
-**完成标准**: 11-interaction-index.md 包含常见问题和答案
+**完成标准**: 12-interaction-index.md 包含常见问题和答案
 
 **相关技能**: 无
 
@@ -830,10 +830,10 @@ echo ""
 echo "✅ Core 分析完成!"
 echo "📊 新增生成的文档:"
 echo "  - 05-third-party-deps.md (依赖清单)"
-echo "  - 11-interaction-index.md (交互索引)"
-echo "  - 07-code-relations.md (调用链+数据流)"
+echo "  - 12-interaction-index.md (交互索引)"
+echo "  - 08-code-relations.md (调用链+数据流)"
 echo ""
-echo "📍 查看文档: cat docs/project-analysis/11-interaction-index.md"
+echo "📍 查看文档: cat docs/project-analysis/12-interaction-index.md"
 ```
 
 **验证命令**: 同Task 1.5
@@ -899,7 +899,7 @@ set -e
 
 PROJECT_ROOT=${1:-"."}
 OUTPUT_DIR="docs/project-analysis"
-ARCH_FILE="$OUTPUT_DIR/08-architecture-patterns.md"
+ARCH_FILE="$OUTPUT_DIR/09-architecture-patterns.md"
 
 echo "🏗️ Analyzing architecture patterns..."
 
@@ -957,7 +957,7 @@ fi
 echo "✅ Level 5 分析完成"
 ```
 
-**完成标准**: 08-architecture-patterns.md 包含架构模式识别
+**完成标准**: 09-architecture-patterns.md 包含架构模式识别
 
 **相关技能**: 无
 
@@ -965,7 +965,7 @@ echo "✅ Level 5 分析完成"
 
 ---
 
-### Task 3.2: 生成09-testing-strategy.md 测试策略
+### Task 3.2: 生成10-testing-strategy.md 测试策略
 
 **目标**: 分析测试覆盖率和工具链
 
@@ -978,10 +978,10 @@ echo "✅ Level 5 分析完成"
 bash skills/code-structure-reader/generate-testing.sh
 
 # 验证输出
-grep "测试覆盖\|工具链\|运行测试" docs/project-analysis/09-testing-strategy.md
+grep "测试覆盖\|工具链\|运行测试" docs/project-analysis/10-testing-strategy.md
 ```
 
-**完成标准**: 09-testing-strategy.md 包含测试策略
+**完成标准**: 10-testing-strategy.md 包含测试策略
 
 **相关技能**: test-driven-development
 
@@ -989,7 +989,7 @@ grep "测试覆盖\|工具链\|运行测试" docs/project-analysis/09-testing-st
 
 ---
 
-### Task 3.3: 生成10-quality-reports.md 质量&安全报告
+### Task 3.3: 生成11-quality-reports.md 质量&安全报告
 
 **目标**: 合并技术债务和安全风险到统一报告
 
@@ -997,7 +997,7 @@ grep "测试覆盖\|工具链\|运行测试" docs/project-analysis/09-testing-st
 
 **完整代码**: 包含代码复杂度分析(简化)
 
-**完成标准**: 10-quality-reports.md 包含技术债务和安全风险
+**完成标准**: 11-quality-reports.md 包含技术债务和安全风险
 
 **相关技能**: 无
 
@@ -1037,19 +1037,19 @@ if [ "$COUNT" -lt 10 ]; then
         echo "  → 01-frontend-components.md"
         ;;
       */api/*|*Controller*.ts|*Controller*.js)
-        echo "  → 02-backend-apis.md + 07-code-relations.md"
+        echo "  → 02-backend-apis.md + 08-code-relations.md"
         ;;
       */domain/*|*Service*.ts)
-        echo "  → 03-backend-domains.md + 07-code-relations.md"
+        echo "  → 03-backend-domains.md + 08-code-relations.md"
         ;;
       */models/*|*Repository*.ts|*migrations/*)
         echo "  → 04-database-schemas.md"
         ;;
       package.json|requirements.txt|pom.xml
-        echo "  → 05-third-party-deps.md + 10-quality-reports.md"
+        echo "  → 05-third-party-deps.md + 11-quality-reports.md"
         ;;
       *.test.ts|*.test.js|*.spec.ts)
-        echo "  → 09-testing-strategy.md"
+        echo "  → 10-testing-strategy.md"
         ;;
     esac
   done

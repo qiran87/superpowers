@@ -51,21 +51,22 @@ questions:
 
 2. Use the `Skill` tool to invoke `superpowers:code-structure-reader`
 
-3. Wait for the skill to complete. It will generate 11 documents at `docs/project-analysis/`:
+3. Wait for the skill to complete. It will generate 12 documents at `docs/project-analysis/`:
    - 00-overview.md (Project overview)
    - 01-frontend-components.md (Frontend architecture)
    - 02-backend-apis.md (API endpoints)
    - 03-backend-domains.md (Domain models)
    - 04-database-schemas.md (Database structure)
    - 05-third-party-deps.md (Dependencies)
-   - 06-dev-guide.md (Development guide)
-   - 07-code-relations.md (Dependencies + calls + data flows)
-   - 08-architecture-patterns.md (Architecture patterns)
-   - 09-testing-strategy.md (Testing approach)
-   - 10-quality-reports.md (Technical debt + security)
-   - 11-interaction-index.md (Navigation index)
+   - 06-external-apis.md (External services)
+   - 07-dev-guide.md (Development guide)
+   - 08-code-relations.md (Dependencies + calls + data flows)
+   - 09-architecture-patterns.md (Architecture patterns)
+   - 10-testing-strategy.md (Testing approach)
+   - 11-quality-reports.md (Technical debt + security)
+   - 12-interaction-index.md (Navigation index)
 
-4. After completion, announce: "✅ Documentation analysis complete! Generated 11 comprehensive documents at `docs/project-analysis/`. I'll use this fresh context to inform our design discussion."
+4. After completion, announce: "✅ Documentation analysis complete! Generated 12 comprehensive documents at `docs/project-analysis/`. I'll use this fresh context to inform our design discussion."
 
 5. Proceed to "Understanding the idea" section with updated context
 
@@ -164,6 +165,202 @@ Whether documentation was updated or not, proceed to the "Understanding the idea
 > - What are the authentication and authorization mechanisms?
 > - What are the error codes and response formats?
 > - What are the rate limiting and throttling strategies?
+>
+> **🔍 EXTERNAL API INTEGRATION (外部接口集成):**
+>
+> **当设计涉及调用外部服务时，必须设计适配器层:**
+>
+> **1. 分析外部接口字段差异 (REQUIRED)**
+>
+> **检查所有外部接口并记录:**
+> - 外部接口 A 返回的字段格式
+> - 外部接口 B 返回的字段格式
+> - 识别字段命名不一致的地方
+>
+> **示例场景:**
+> ```typescript
+> // 外部接口 A: { n: "value" }
+> // 外部接口 B: { name: "value" }
+> // → 字段命名不一致！
+> ```
+>
+> **2. 设计适配器层 (Adapter Layer) - REQUIRED**
+>
+> **⚠️ CRITICAL: 直接使用外部接口字段是架构违规**
+>
+> **必须创建:**
+> - **统一的内部字段命名** - 所有外部接口通过适配器后使用统一字段
+> - **适配器服务** - 处理外部字段到内部字段的映射
+> - **隔离层** - 防止外部接口变化影响内部系统
+>
+> **架构设计:**
+> ```
+> External API A → UserAdapter_A → Internal System (统一字段)
+> External API B → UserAdapter_B → Internal System (统一字段)
+> ```
+>
+> **3. 字段映射配置 (REQUIRED)**
+>
+> **必须在设计中明确记录:**
+> ```markdown
+> ## External API Field Mapping
+>
+> ### External API A
+> | External Field | Internal Field | Transformation |
+> |----------------|----------------|----------------|
+> | `n` | `name` | Direct mapping |
+> | `id` | `externalId` | Rename to avoid collision |
+>
+> ### External API B
+> | External Field | Internal Field | Transformation |
+> |----------------|----------------|----------------|
+> | `name` | `name` | No transformation needed |
+> ```
+>
+> **4. 实现示例**
+>
+> **❌ WRONG: 直接使用外部字段**
+> ```typescript
+> class UserService {
+>     // 接口 A
+>     async getUserFromAPI_A() {
+>         const response = await fetch('https://api-a.com/user');
+>         const user = await response.json();
+>         return { name: user.n };  // ❌ 直接使用外部字段 n
+>     }
+>
+>     // 接口 B
+>     async getUserFromAPI_B() {
+>         const response = await fetch('https://api-b.com/user');
+>         const user = await response.json();
+>         return { name: user.name };  // ❌ 与接口A处理方式不同
+>     }
+> }
+> ```
+>
+> **✅ RIGHT: 通过适配器层统一处理**
+> ```typescript
+> // 适配器层 - 处理字段映射
+> class UserAdapterService {
+>     async getUserFromAPI_A() {
+>         const externalUser = await externalAPI_A.getUser();
+>         // 字段映射: n → name
+>         return {
+>             name: externalUser.n,
+>             externalId: externalUser.id
+>         };
+>     }
+>
+>     async getUserFromAPI_B() {
+>         const externalUser = await externalAPI_B.getUser();
+>         // 字段映射: name → name (无需转换)
+>         return {
+>             name: externalUser.name,
+>             externalId: externalUser.id
+>         };
+>     }
+> }
+>
+> // 统一的内部接口
+> class UserService {
+>     constructor(private adapter: UserAdapterService) {}
+>
+>     async getUser(source: 'api-a' | 'api-b', externalId: string) {
+>         // 统一的内部字段: name
+>         return await this.adapter.getUser(source, externalId);
+>     }
+> }
+> ```
+>
+> **5. 协议文档更新要求**
+>
+> **必须同时更新两个文档：**
+>
+> **1. 外部接口文档: `docs/project-analysis/06-external-apis.md`**
+> ```markdown
+> ## [External Service Name]
+>
+> **Base URL:** `https://api.example.com`
+>
+> **Authentication:** API Key / OAuth 2.0 / Bearer Token
+>
+> **Endpoints:**
+> | Method | Path | Purpose | Request Fields | Response Fields |
+> |--------|------|---------|----------------|-----------------|
+> | GET | `/api/users/:id` | Get user | `id` | `n`, `id` |
+>
+> **Field Mapping (External → Internal):**
+> | External Field | Internal Field | Type | Transformation |
+> |----------------|----------------|------|----------------|
+> | `n` | `name` | string | Direct mapping |
+> | `id` | `externalId` | string | Rename to avoid collision |
+> ```
+>
+> **2. 内部适配器接口: `docs/project-analysis/02-backend-apis.md`**
+> ```markdown
+> ## [ServiceName]Adapter API
+>
+> **Description:** 适配器层，统一外部 [Service Name] 接口字段
+>
+> **Internal Schema:**
+> ```json
+> {
+>   "name": "string",      // 统一的字段
+>   "externalId": "string" // 外部系统 ID
+> }
+> ```
+>
+> **Adapter Implementation:** `src/adapters/[ServiceName]AdapterService.ts`
+> ```
+>
+> **6. 常见错误模式**
+>
+> ❌ **直接使用外部字段**
+> ```typescript
+> const user = await externalAPI.getUser();
+> const name = user.n;  // 外部字段直接使用
+> ```
+>
+> ❌ **在不同接口使用不同处理**
+> ```typescript
+> // 接口 A
+> const nameA = user.n;
+> // 接口 B
+> const nameB = user.name;
+> // → 内部系统字段不统一!
+> ```
+>
+> ❌ **在多处重复映射逻辑**
+> ```typescript
+> // 重复的映射逻辑散落在各处
+> const name1 = externalUser1.n;
+> const name2 = externalUser2.n;
+> ```
+>
+> ✅ **正确: 统一的适配器层**
+> ```typescript
+> // 所有外部接口都通过适配器
+> const user = await adapter.getUser(source, id);
+> const name = user.name;  // 统一使用内部字段
+> ```
+>
+> **7. 询问用户 (在设计阶段)**
+>
+> **在设计涉及外部接口时，必须询问:**
+> ```yaml
+> questions:
+>   - question: "这个功能是否涉及调用外部服务？"
+>     options:
+>       - label: "是，需要调用外部接口"
+>       - label: "否，仅内部系统"
+>       - label: "不确定"
+> ```
+>
+> **如果选择"是"：**
+> - 列出所有外部接口及其字段格式
+> - 识别字段命名不一致的地方
+> - 设计适配器层处理字段映射
+> - 在协议文档中记录映射关系
 
 > **Security & Performance:**
 > - What are the data encryption and hashing algorithms?

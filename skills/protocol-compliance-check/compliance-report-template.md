@@ -456,6 +456,7 @@ All database operations comply with schema definition:
    - [ ] Update `docs/project-analysis/02-backend-apis.md`
    - [ ] Update `docs/project-analysis/03-backend-domains.md`
    - [ ] Update `docs/project-analysis/04-database-schemas.md`
+   - [ ] Update `docs/project-analysis/06-external-apis.md` (if external APIs changed)
 
 3. **Testing Recommendations**
    - [ ] Add integration tests to catch mismatches
@@ -501,7 +502,8 @@ All database operations comply with schema definition:
 2. **Backend APIs:** `docs/project-analysis/02-backend-apis.md`
 3. **Domain Models:** `docs/project-analysis/03-backend-domains.md`
 4. **Database Schema:** `docs/project-analysis/04-database-schemas.md`
-5. **Code Relations:** `docs/project-analysis/07-code-relations.md`
+5. **External APIs:** `docs/project-analysis/06-external-apis.md`
+6. **Code Relations:** `docs/project-analysis/08-code-relations.md`
 
 ### Code Files Analyzed
 

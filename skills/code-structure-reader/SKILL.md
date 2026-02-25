@@ -7,7 +7,7 @@ description: Use when joining a new project, onboarding team members, designing 
 
 ## Overview
 
-**Systematically analyze codebase across 5 levels (structure → dependencies → call chains → data flow → architecture) and generate 11 maintainable, incremental-updateable Markdown documents with interaction index for fast project understanding.**
+**Systematically analyze codebase across 5 levels (structure → dependencies → call chains → data flow → architecture) and generate 12 maintainable, incremental-updateable Markdown documents with interaction index for fast project understanding.**
 
 Core principle: One analysis pass generates organized documentation by domain layer (frontend/API/domain/database/quality/dev-guide), not by file, with smart incremental updates based on code changes.
 
@@ -58,7 +58,7 @@ Level 5: Architecture Patterns
 
 **Key insight**: Each level builds on previous analysis - don't skip levels if you need deep understanding.
 
-### Domain-Layered Documentation (11 Files)
+### Domain-Layered Documentation (12 Files)
 
 ```
 Analysis Layer           → Document File
@@ -69,15 +69,17 @@ Backend APIs          → 02-backend-apis.md
 Domain Models         → 03-backend-domains.md
 Database Schemas      → 04-database-schemas.md
 Third-party Deps      → 05-third-party-deps.md
-Dev Guide            → 06-dev-guide.md
-Code Relations*      → 07-code-relations.md (deps + calls + flows)
-Architecture Patterns  → 08-architecture-patterns.md
-Testing Strategy      → 09-testing-strategy.md
-Quality Reports*      → 10-quality-reports.md (debt + security)
-Interaction Index**   → 11-interaction-index.md
+External APIs*        → 06-external-apis.md (external services)
+Dev Guide            → 07-dev-guide.md
+Code Relations**      → 08-code-relations.md (deps + calls + flows)
+Architecture Patterns  → 09-architecture-patterns.md
+Testing Strategy      → 10-testing-strategy.md
+Quality Reports**      → 11-quality-reports.md (debt + security)
+Interaction Index***   → 12-interaction-index.md
 ```
 
 *Merged files for better maintainability
+**New file for external API documentation
 
 ### Smart Incremental Update
 
@@ -98,15 +100,16 @@ fi
 | Change | Affected Files |
 |---------|---------------|
 | Frontend components | `01-frontend-components.md` |
-| API routes | `02-backend-apis.md` + `07-code-relations.md` |
-| Domain logic | `03-backend-domains.md` + `07-code-relations.md` |
+| API routes | `02-backend-apis.md` + `08-code-relations.md` |
+| Domain logic | `03-backend-domains.md` + `08-code-relations.md` |
 | Database/models | `04-database-schemas.md` |
-| package.json | `05-third-party-deps.md` + `10-quality-reports.md` |
-| Config/scripts | `06-dev-guide.md` |
-| **Code logic** | **`07-code-relations.md`** (unified) |
-| Test files | `09-testing-strategy.md` |
-| Architecture | `08-architecture-patterns.md` |
-| Quality/Security | `10-quality-reports.md` (unified) |
+| package.json | `05-third-party-deps.md` + `11-quality-reports.md` |
+| External API calls | `06-external-apis.md` |
+| Config/scripts | `07-dev-guide.md` |
+| **Code logic** | **`08-code-relations.md`** (unified) |
+| Test files | `10-testing-strategy.md` |
+| Architecture | `09-architecture-patterns.md` |
+| Quality/Security | `11-quality-reports.md` (unified) |
 
 ## Quick Reference
 
@@ -128,6 +131,10 @@ grep -r "import.*from" src/ --include="*.ts,*.tsx" | deps-graph
 
 # Python
 pdepend src/ | dot -T png > deps.png
+
+# External API Detection (for 06-external-apis.md)
+grep -r "fetch\|axios\|https://" src/ --include="*.ts,*.tsx,*.js" | external-calls
+grep -r "import.*api\|from '.*api'" src/ --include="*.ts,*.tsx" | third-party-sdk
 ```
 
 **Level 3: Call Chains**
@@ -211,10 +218,11 @@ echo "Detected: $PROJECT_TYPE"
 # Pseudo-code
 levels = [
     {"name": "structure", "file": "00-overview.md"},
-    {"name": "dependencies", "file": "07-code-relations.md"},
-    {"name": "callchains", "file": "07-code-relations.md"},
-    {"name": "dataflow", "file": "07-code-relations.md"},
-    {"name": "architecture", "file": "08-architecture-patterns.md"}
+    {"name": "dependencies", "file": "08-code-relations.md"},
+    {"name": "external-apis", "file": "06-external-apis.md"},
+    {"name": "callchains", "file": "08-code-relations.md"},
+    {"name": "dataflow", "file": "08-code-relations.md"},
+    {"name": "architecture", "file": "09-architecture-patterns.md"}
 ]
 
 for level in levels:
@@ -222,7 +230,7 @@ for level in levels:
     generate_doc(level["file"])
 ```
 
-### Step 3: Generate 11 Files
+### Step 3: Generate 12 Files
 
 ```bash
 # Create output directory
@@ -231,7 +239,55 @@ mkdir -p docs/project-analysis
 # Generate files in order
 create_file "00-overview.md" "# Project Overview\n..."
 create_file "01-frontend-components.md" "# Frontend Components\n..."
-# ... continue for all 11 files
+create_file "06-external-apis.md" "# External APIs\n..."
+# ... continue for all 12 files
+```
+
+**06-external-apis.md Template:**
+```markdown
+# External APIs
+
+> **Purpose:** Document external service interfaces for design, development, and testing reference
+
+## Detection Method
+
+Auto-detected from code by scanning for:
+- `fetch()`, `axios()` calls with external URLs
+- Third-party SDK imports (e.g., `import S3 from 'aws-sdk'`)
+- HTTP client libraries (e.g., `import { HttpClient } from '@angular/common/http'`)
+
+## External Services
+
+### [Service Name]
+
+**Base URL:** `https://api.example.com`
+
+**Authentication:**
+- Method: API Key / OAuth 2.0 / Bearer Token
+- Header Name: `Authorization` / `X-API-Key`
+- Token Location: Environment variable / Config file
+
+**Endpoints:**
+
+| Method | Path | Purpose | Request Fields | Response Fields |
+|--------|------|---------|----------------|-----------------|
+| GET | `/api/users/:id` | Get user by ID | `id` | `id`, `name`, `email` |
+| POST | `/api/users` | Create user | `name`, `email` | `id`, `createdAt` |
+
+**Field Mapping (External → Internal):**
+
+| External Field | Internal Field | Type | Transformation |
+|----------------|----------------|------|----------------|
+| `n` | `name` | string | Direct mapping |
+| `ts` | `timestamp` | number | Convert to Date |
+
+**Adapter Implementation:** `src/adapters/[ServiceName]Adapter.ts`
+
+**Usage in Code:**
+- `src/services/[ServiceName]Service.ts:45`
+- `src/controllers/[Controller]Controller.ts:123`
+
+---
 ```
 
 **File content templates** are in design document: `docs/plans/2025-02-11-code-structure-reader-design-v3.md`
@@ -321,13 +377,13 @@ Each level provides unique insights
 
 **Wrong:**
 ```
-Generated 10 docs but no entry point
+Generated 11 docs but no entry point
 → Users don't know where to start
 ```
 
 **Right:**
 ```
-ALWAYS create 11-interaction-index.md
+ALWAYS create 12-interaction-index.md
 Include common questions with links to specific docs
 ```
 
@@ -357,7 +413,8 @@ Putting frontend components and database schemas in same doc
 Keep separate files:
 - 01-frontend-components.md (updates on component changes)
 - 04-database-schemas.md (updates on migration changes)
-Merge only semantically related content (like 07-code-relations.md)
+- 06-external-apis.md (updates on external API integration)
+Merge only semantically related content (like 08-code-relations.md)
 ```
 
 ## Real-World Impact

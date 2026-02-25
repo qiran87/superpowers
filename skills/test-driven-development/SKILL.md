@@ -202,6 +202,14 @@ digraph tdd_cycle {
 >    - "According to docs/project-analysis/02-backend-apis.md, the field name is `symbol`"
 >    - "API endpoint is GET /api/stocks/:symbol"
 >
+> **🔍 EXTERNAL API CHECK:**
+>
+> **If test involves external interface calls:**
+> - Read `docs/project-analysis/06-external-apis.md`
+> - Verify external API field mappings (external → internal)
+> - Mock external responses according to documented schema
+> - Document: "External API returns `n`, mapped to internal field `name`"
+>
 > **Only after completing Step 0:** Proceed to Step 1
 >
 > **Common mistakes to avoid:**

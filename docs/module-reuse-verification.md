@@ -96,7 +96,7 @@ claude -p "帮我设计一个订单退款功能，使用 brainstorming 技能"
 - [ ] `02-backend-apis.md` - 后端接口
 - [ ] `03-backend-domains.md` - 领域模型
 - [ ] `04-database-schemas.md` - 数据库架构
-- [ ] `07-code-relations.md` - 代码关系（如适用）
+- [ ] `08-code-relations.md` - 代码关系（如适用）
 
 ## ⚠️ 常见问题
 

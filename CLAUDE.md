@@ -13,6 +13,7 @@ Superpowers 是一个完整的软件开发工作流技能库,为 AI 编程代理
 - **命令 (commands/):** 斜杠命令,用于触发特定工作流
 - **代理 (agents/):** 子代理配置,用于特定任务(如代码审查)
 - **钩子 (hooks/):** SessionStart 钩子,自动注入技能上下文到每个会话
+- **插件配置 (.claude-plugin/):** 插件清单和钩子配置
 - **测试 (tests/):** 针对不同平台的技能验证测试
 - **文档 (docs/):** 针对 Codex 和 OpenCode 的安装指南、设计文档和实施计划
 
@@ -54,6 +55,25 @@ Superpowers 作为 Claude Code 插件运行,通过斜杠命令提供快捷方式
 - **参考型(Reference):** API 文档,语法指南
 - **纪律型(Discipline):** 强制执行规则的技能(如 `test-driven-development`, `verification-before-completion`)
 
+**完整技能列表 (v4.2.0):**
+- **brainstorming** - 在任何创造性工作之前使用,通过苏格拉底式对话完善需求
+- **code-structure-reader** - 系统化分析代码库结构,生成11份增量可维护的中文文档
+- **design-with-existing-modules** - 设计技术方案时检查现有可复用模块,避免重复开发
+- **dispatching-parallel-agents** - 将2+个独立任务分派给并行子代理
+- **executing-plans** - 在单独会话中批量执行计划,在检查点暂停审查
+- **finishing-a-development-branch** - 任务完成后验证测试,呈现合并/PR选项
+- **protocol-compliance-check** - 验证代码实现与协议文档的一致性
+- **receiving-code-review** - 接收代码审查反馈时的技术严谨性验证
+- **requesting-code-review** - 任务完成后根据计划和编码标准审查工作
+- **subagent-driven-development** - 在当前会话中执行计划,每个任务分派新子代理
+- **systematic-debugging** - 系统化调试四阶段流程(根因追溯、防御深度、条件等待)
+- **test-driven-development** - 强制 RED-GREEN-REFACTOR 循环
+- **using-git-worktrees** - 创建隔离的 Git 工作树用于并行开发
+- **using-superpowers** - 技能系统介绍和使用指南
+- **verification-before-completion** - 在声明完成前验证问题已解决
+- **writing-plans** - 将批准的设计分解为2-5分钟的小任务
+- **writing-skills** - 创建新技能的最佳实践和测试方法
+
 **技能结构:**
 - 每个技能目录包含必需的 `SKILL.md` 文件
 - YAML frontmatter 定义 `name` 和 `description`(最多 1024 字符)
@@ -70,6 +90,13 @@ Superpowers 作为 Claude Code 插件运行,通过斜杠命令提供快捷方式
 
 **代理类型:**
 - **code-reviewer:** 高级代码审查代理,审查已完成工作与计划的一致性
+
+**code-reviewer 工作流:**
+1. **协议合规性检查:** 使用 `protocol-compliance-check` 技能验证实现与协议文档一致
+2. **代码质量评估:** 审查代码质量、测试覆盖、TDD 合规性
+3. **架构设计审查:** 验证 SOLID 原则和架构模式
+4. **问题分类:** Critical (必须修复), Important (应该修复), Suggestions (建议)
+5. **沟通协议:** 发现重大偏差时要求编码代理确认
 
 **子代理工作流:**
 - `subagent-driven-development`: 在当前会话中执行计划,每个任务分派新的子代理
@@ -90,9 +117,13 @@ Superpowers 作为 Claude Code 插件运行,通过斜杠命令提供快捷方式
 - 定义插件名称、描述、版本和关键词
 - 关键词用于插件发现:"skills", "tdd", "debugging", "collaboration"
 
-**hooks.json** - 钩子配置:
+**hooks.json** - 钩子配置 (位于 `.claude-plugin/hooks.json`):
 - 定义 SessionStart 钩子
 - 异步执行以防止 Windows 终端冻结
+
+**marketplace.json** - 市场发布配置 (位于 `.claude-plugin/marketplace.json`):
+- 定义插件市场信息
+- 列出所有可用技能
 
 ## 核心开发工作流
 
@@ -391,14 +422,26 @@ cleanup_test_project "$test_dir"
 - docs/README.codex.md - Codex 完整指南
 - docs/README.opencode.md - OpenCode 完整指南
 
+**插件配置:**
+- .claude-plugin/plugin.json - 插件清单
+- .claude-plugin/hooks.json - 钩子配置
+- .claude-plugin/marketplace.json - 市场发布配置
+
 **技能开发参考:**
 - skills/writing-skills/SKILL.md - 创建技能的完整指南
 - skills/writing-skills/testing-skills-with-subagents.md - 技能测试方法
 - skills/writing-skills/anthropic-best-practices.md - 官方技能作者最佳实践
 - skills/writing-skills/graphviz-conventions.dot - Graphviz 样式指南
 
+**新增技能参考:**
+- skills/brainstorming/SKILL.md - 头脑风暴工作流
+- skills/code-structure-reader/SKILL.md - 代码库结构化分析
+- skills/design-with-existing-modules/SKILL.md - 基于现有模块的设计
+- skills/protocol-compliance-check/SKILL.md - 协议合规性检查
+
 **测试参考:**
 - tests/claude-code/test-helpers.sh - 测试辅助函数
+- tests/claude-code/README.md - 测试套件文档
 - tests/subagent-driven-dev/ - 完整工作流示例
 - docs/testing.md - 测试指南
 

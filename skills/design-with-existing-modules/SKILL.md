@@ -324,6 +324,32 @@ Get notification delivery status
 ```
 ```
 
+### Step 5: API Documentation Sync (CRITICAL)
+
+> **⚠️ MANDATORY CHECKPOINT:**
+>
+> **Before completing the design, verify API documentation is synchronized:**
+>
+> 1. **Extract API Definitions** from the design document's Part 2A "API Design" section
+> 2. **Read** `docs/project-analysis/02-backend-apis.md` to understand existing format
+> 3. **For each NEW/MODIFIED API:**
+>    - Append to `02-backend-apis.md` following the existing format
+>    - Mark with `[NEW]` or `[MODIFIED date]` tags
+>    - Include: endpoint, method, request/response schemas, error codes
+> 4. **Verify** the file was updated correctly
+> 5. **Ask user** to confirm: "已将 X 个 API 同步更新到 `docs/project-analysis/02-backend-apis.md`，请确认格式正确"
+>
+> **DO NOT proceed** until user confirms or file is verified updated.
+>
+> **Required output format for each API:**
+> ```markdown
+> #### METHOD /api/resource-name
+> **描述:** 操作说明
+> **请求:** `{field: type, ...}`
+> **响应:** `{field: type, ...}`
+> **错误码:** 列表
+> ```
+
 ## Common Mistakes
 
 ### ❌ Not Checking All Module Types

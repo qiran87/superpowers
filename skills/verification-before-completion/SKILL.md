@@ -105,6 +105,172 @@ Skip any step = lying, not verifying
 ❌ Trust agent report
 ```
 
+## Verification Methods
+
+### HTTP/API Testing
+
+**Simple curl verification:**
+```bash
+# Verify API endpoint returns expected response
+curl -X POST http://localhost:3000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","name":"Test User"}' \
+  -w "\nHTTP Status: %{http_code}\n"
+
+# Expected: HTTP Status: 201
+# Verify: Response contains user data
+```
+
+**Complex API verification:**
+```bash
+# Test multiple endpoints in sequence
+TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password"}' \
+  | jq -r '.token')
+
+curl -s -X GET http://localhost:3000/api/users/me \
+  -H "Authorization: Bearer $TOKEN" \
+  | jq '.email == "test@example.com"'
+
+# Expected: true
+```
+
+### Python Verification Scripts
+
+**Simple verification:**
+```python
+# verify_fix.py
+import requests
+
+response = requests.post('http://localhost:3000/api/users', json={
+    'email': 'test@example.com',
+    'name': 'Test User'
+})
+
+assert response.status_code == 201, f"Expected 201, got {response.status_code}"
+data = response.json()
+assert 'id' in data, "Response missing user ID"
+assert data['email'] == 'test@example.com', f"Email mismatch: {data['email']}"
+
+print("✅ Fix verified: User created successfully")
+```
+
+**Database verification:**
+```python
+# verify_db_fix.py
+import psycopg2
+
+conn = psycopg2.connect("dbname=test user=postgres")
+cur = conn.cursor()
+
+cur.execute("SELECT COUNT(*) FROM users WHERE email = %s", ('test@example.com',))
+count = cur.fetchone()[0]
+
+assert count > 0, "User not found in database"
+print(f"✅ Fix verified: {count} user(s) found")
+
+cur.close()
+conn.close()
+```
+
+### Shell Command Verification
+
+**Service health check:**
+```bash
+# Verify service is running and healthy
+curl -f http://localhost:3000/health || exit 1
+echo "✅ Service is healthy"
+
+# Check with timeout
+timeout 5 curl -f http://localhost:3000/health || {
+  echo "❌ Service health check failed"
+  exit 1
+}
+```
+
+**File content verification:**
+```bash
+# Verify log file contains expected output
+grep "expected_string" output.log || {
+  echo "❌ Expected string not found in output"
+  exit 1
+}
+echo "✅ Output verified"
+
+# Count occurrences
+COUNT=$(grep -c "success" output.log)
+if [ "$COUNT" -lt 5 ]; then
+  echo "❌ Expected at least 5 success messages, got $COUNT"
+  exit 1
+fi
+echo "✅ Found $COUNT success messages"
+```
+
+**Process verification:**
+```bash
+# Verify background process is running
+if ! pgrep -f "my_service"; then
+  echo "❌ Service process not running"
+  exit 1
+fi
+echo "✅ Service process is running"
+
+# Verify port is listening
+if ! netstat -an | grep 3000 | grep LISTEN; then
+  echo "❌ Port 3000 not listening"
+  exit 1
+fi
+echo "✅ Port 3000 is listening"
+```
+
+### Integration Test Verification
+
+**Multi-step verification:**
+```bash
+# Full integration test
+echo "Step 1: Create user..."
+USER_ID=$(curl -s -X POST http://localhost:3000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com"}' | jq -r '.id')
+
+echo "Step 2: Verify user exists..."
+curl -s -X GET "http://localhost:3000/api/users/$USER_ID" \
+  | jq '.email == "test@example.com"' || {
+  echo "❌ User verification failed"
+  exit 1
+}
+
+echo "Step 3: Update user..."
+curl -s -X PUT "http://localhost:3000/api/users/$USER_ID" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Updated Name"}' > /dev/null
+
+echo "Step 4: Verify update..."
+curl -s -X GET "http://localhost:3000/api/users/$USER_ID" \
+  | jq '.name == "Updated Name"' || {
+  echo "❌ Update verification failed"
+  exit 1
+}
+
+echo "✅ All integration tests passed"
+```
+
+### Error Detection Verification
+
+**Verify error is fixed:**
+```bash
+# Before fix: This would return 500
+# After fix: Should return proper validation error
+curl -X POST http://localhost:3000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":""}' \
+  -w "\nHTTP Status: %{http_code}\n"
+
+# Expected: HTTP Status: 400 (not 500)
+# Expected response: {"error": "Email required"}
+```
+
 ## Why This Matters
 
 From 24 failure memories:

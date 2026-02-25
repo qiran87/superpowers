@@ -496,6 +496,12 @@ Before marking work complete:
 - [ ] Output pristine (no errors, warnings)
 - [ ] Tests use real code (mocks only if unavoidable)
 - [ ] Edge cases and errors covered
+- [ ] **Integration points verified:**
+  - [ ] Frontend components call backend APIs as designed
+  - [ ] Frontend components are integrated into pages/routes
+  - [ ] E2E tests validate end-to-end workflows (if applicable)
+  - [ ] Call chain matches code-relations.md (if exists)
+  - [ ] Backend APIs have frontend callers (if applicable)
 
 Can't check all boxes? You skipped TDD. Start over.
 

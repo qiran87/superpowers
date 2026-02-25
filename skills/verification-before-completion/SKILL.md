@@ -271,6 +271,206 @@ curl -X POST http://localhost:3000/api/users \
 # Expected response: {"error": "Email required"}
 ```
 
+### Component Integration Verification
+
+**MANDATORY for frontend component development:**
+
+**Purpose:** Verify that developed components are actually integrated and reachable in the application.
+
+**Common Failures to Detect:**
+- Component developed but never imported in any page/route
+- Component imported but never rendered
+- Backend API developed but frontend doesn't call it
+- Component calls wrong API endpoint
+- Missing E2E test coverage for critical user flows
+
+---
+
+**Check 1: Component is integrated into page**
+
+```bash
+# Verify component is imported in at least one page/route
+COMPONENT_NAME="ComponentName"
+if ! grep -r "import.*${COMPONENT_NAME}" src/pages/ src/routes/ src/app/ 2>/dev/null; then
+  echo "❌ Component '${COMPONENT_NAME}' not imported in any page/route"
+  echo "   The component exists but is unreachable from the application"
+  exit 1
+fi
+echo "✅ Component '${COMPONENT_NAME}' imported in pages"
+
+# Verify component is rendered in template
+if ! grep -r "<${COMPONENT_NAME}" src/pages/ src/routes/ src/app/ 2>/dev/null; then
+  echo "⚠️  Component '${COMPONENT_NAME}' imported but may not be rendered"
+  echo "   Check if component is conditionally rendered or used as a wrapper"
+else
+  echo "✅ Component '${COMPONENT_NAME}' rendered in pages"
+fi
+```
+
+---
+
+**Check 2: Frontend calls backend API**
+
+```bash
+# Verify component calls expected backend API
+COMPONENT_FILE="src/components/ComponentName.tsx"
+API_ENDPOINT="api/users"
+
+# Check for fetch calls
+if ! grep -q "fetch.*${API_ENDPOINT}" "${COMPONENT_FILE}" 2>/dev/null; then
+  # Check for API client calls (common patterns)
+  if ! grep -q -E "(api\.|client\.|axios\.|http\.).*${API_ENDPOINT}" "${COMPONENT_FILE}" 2>/dev/null; then
+    echo "❌ Component does not call expected API endpoint: ${API_ENDPOINT}"
+    echo "   Component may not display any data from backend"
+    exit 1
+  fi
+fi
+echo "✅ Component calls API endpoint: ${API_ENDPOINT}"
+```
+
+---
+
+**Check 3: E2E test coverage (if applicable)**
+
+```bash
+# Run E2E tests for this component (if E2E framework exists)
+if npm run test:e2e -- --help >/dev/null 2>&1; then
+  echo "Running E2E tests for ${COMPONENT_NAME}..."
+
+  if ! npm run test:e2e -- --grep "${COMPONENT_NAME}" 2>&1; then
+    echo "❌ E2E tests failed for component: ${COMPONENT_NAME}"
+    echo "   Component integration may be broken"
+    exit 1
+  fi
+
+  echo "✅ E2E tests passed for component: ${COMPONENT_NAME}"
+else
+  echo "⚠️  No E2E test framework found, skipping E2E verification"
+fi
+```
+
+---
+
+**Check 4: Backend API has frontend callers**
+
+```bash
+# Verify backend API is actually called by frontend
+API_PATH="api/users/:id"
+FRONTEND_SRC="src/"
+
+if ! grep -r "${API_PATH}" "${FRONTEND_SRC}" 2>/dev/null | grep -v node_modules | grep -v ".test." | grep -v ".spec."; then
+  echo "⚠️  Backend API ${API_PATH} has no frontend callers"
+  echo "   API may be developed but never used"
+  echo "   Verify if this is intentional (e.g., internal API, future use)"
+else
+  echo "✅ Backend API ${API_PATH} has frontend callers"
+fi
+```
+
+---
+
+**Full Integration Verification Script:**
+
+```bash
+#!/bin/bash
+# verify-integration.sh - Verify component integration
+
+set -e
+
+COMPONENT_NAME="${1}"
+API_ENDPOINT="${2}"
+
+echo "🔍 Verifying integration for: ${COMPONENT_NAME}"
+echo ""
+
+# Check 1: Component exists
+COMPONENT_FILE="src/components/${COMPONENT_NAME}.tsx"
+if [ ! -f "${COMPONENT_FILE}" ]; then
+  echo "❌ Component file not found: ${COMPONENT_FILE}"
+  exit 1
+fi
+
+# Check 2: Component is imported in pages
+echo "Checking page integration..."
+if ! grep -rl "import.*${COMPONENT_NAME}" src/pages/ src/routes/ src/app/ 2>/dev/null | head -1; then
+  echo "❌ FAIL: Component not imported in any page"
+  exit 1
+fi
+
+# Check 3: Component is rendered
+echo "Checking render usage..."
+if ! grep -rl "<${COMPONENT_NAME}" src/pages/ src/routes/ src/app/ 2>/dev/null | head -1; then
+  echo "⚠️  WARN: Component imported but may not be rendered"
+fi
+
+# Check 4: API integration
+if [ -n "${API_ENDPOINT}" ]; then
+  echo "Checking API integration..."
+  if ! grep -q "${API_ENDPOINT}" "${COMPONENT_FILE}"; then
+    echo "❌ FAIL: Component does not call API: ${API_ENDPOINT}"
+    exit 1
+  fi
+fi
+
+echo ""
+echo "✅ All integration checks passed"
+```
+
+---
+
+**Verification Examples:**
+
+**Example 1: Verify new component is integrated**
+```bash
+# Before claiming component is complete
+./verify-integration.sh UserProfile "api/users/:id"
+
+# Expected output:
+# ✅ Component imported in pages
+# ✅ Component rendered in pages
+# ✅ Component calls API endpoint: api/users/:id
+```
+
+**Example 2: Detect orphaned component**
+```bash
+./verify-integration.sh OrphanedComponent
+
+# Actual output:
+# ❌ FAIL: Component not imported in any page
+# → The component exists but is unreachable
+```
+
+**Example 3: Detect missing API call**
+```bash
+./verify-integration.sh UserList "api/users"
+
+# Actual output:
+# ✅ Component imported in pages
+# ❌ FAIL: Component does not call API: api/users
+# → Component will never display data
+```
+
+---
+
+**Integration with code-relations.md:**
+
+If `docs/project-analysis/08-code-relations.md` exists, verify actual implementation matches documented call chains:
+
+```bash
+# Extract documented call chain for component
+DOCUMENTED_CHAIN=$(grep -A 10 "## ${COMPONENT_NAME}" docs/project-analysis/08-code-relations.md | grep "API calls:")
+
+# Verify component has documented API calls
+for api in $(echo "$DOCUMENTED_CHAIN" | grep -o 'api/[^\"]*'); do
+  if ! grep -q "$api" src/components/${COMPONENT_NAME}.tsx; then
+    echo "❌ Documented API call not found: $api"
+    exit 1
+  fi
+done
+
+echo "✅ Component implementation matches documented call chain"
+```
+
 ## Why This Matters
 
 From 24 failure memories:

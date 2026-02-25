@@ -65,6 +65,8 @@ digraph process {
         "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [shape=box];
         "Code quality reviewer subagent approves?" [shape=diamond];
         "Implementer subagent fixes quality issues" [shape=box];
+        "⚠️ Feedback verification check (optional but recommended)" [shape=box, style=filled, fillcolor=lightgray, fontcolor=gray];
+        "Use receiving-code-review if feedback seems unclear or questionable" [shape=plaintext, fontsize=10];
         "Mark task complete in TodoWrite" [shape=box];
     }
 
@@ -89,7 +91,10 @@ digraph process {
     "CRITICAL protocol violations found?" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="no"];
     "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" -> "Code quality reviewer subagent approves?";
     "Code quality reviewer subagent approves?" -> "Implementer subagent fixes quality issues" [label="no"];
-    "Implementer subagent fixes quality issues" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="re-review"];
+    "Implementer subagent fixes quality issues" -> "⚠️ Feedback verification check (optional but recommended)" [label="before re-review"];
+    "⚠️ Feedback verification check (optional but recommended)" -> "Use receiving-code-review if feedback seems unclear or questionable" [style=dashed, label="if needed"];
+    "Use receiving-code-review if feedback seems unclear or questionable" [shape=plaintext, fontsize=10];
+    "⚠️ Feedback verification check (optional but recommended)" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="proceed"];
     "Code quality reviewer subagent approves?" -> "Mark task complete in TodoWrite" [label="yes"];
     "Mark task complete in TodoWrite" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
@@ -138,6 +143,8 @@ Protocol check: ✅ No violations - all fields defined, frontend-backend aligned
 [Get git SHAs, dispatch code quality reviewer]
 Code reviewer: Strengths: Good test coverage, clean. Issues: None. Approved.
 
+[⚠️ Feedback verification check - no issues to verify, proceed]
+
 [Mark Task 1 complete]
 
 Task 2: Recovery modes
@@ -175,7 +182,98 @@ Implementer: Extracted PROGRESS_INTERVAL constant
 [Code reviewer reviews again]
 Code reviewer: ✅ Approved
 
+[⚠️ Feedback verification check - no issues to verify, proceed]
+
 [Mark Task 2 complete]
+
+Task 3: Error handling edge case
+
+[Get Task 3 text and context (already extracted)]
+[Dispatch implementation subagent with full task text + context]
+
+Implementer: [No questions, proceeds]
+Implementer:
+  - Added error boundary component
+  - 6/6 tests passing
+  - Self-review: All good
+  - Committed
+
+[Dispatch spec compliance reviewer]
+Spec reviewer: ✅ Spec compliant
+
+[🔍 Protocol compliance check]
+Protocol check: ✅ No violations
+
+[Dispatch code quality reviewer]
+Code reviewer: Issues (Critical):
+  - Suggests: "Replace try-catch with global error handler"
+  - Suggests: "Remove logging as it's redundant"
+
+[⚠️ Feedback verification check - feedback seems questionable]
+Controller: This feedback conflicts with the task requirement ("handle errors locally")
+          Let me verify this feedback BEFORE implementing...
+
+[Step 1: Use superpowers:receiving-code-review]
+Verification result:
+  ❌ "Global error handler" - WRONG: Task requires local error handling
+  ❌ "Remove logging" - WRONG: Spec explicitly requires error logging
+  ✅ Decision: Reject this feedback, implementation is correct
+
+[Controller to Implementer]: Ignore the code reviewer's suggestions - they contradict the spec. Your implementation is correct.
+
+[Implementer confirms]: Understood - keeping local error handling and logging as per spec.
+
+[⚠️ NO further action needed - feedback rejected, no TDD/debugging required]
+
+Task 4: Extract validation logic (feedback accepted)
+
+[Get Task 4 text and context (already extracted)]
+[Dispatch implementation subagent with full task text + context]
+
+Implementer:
+  - Added validation functions
+  - Tests passing
+  - Committed
+
+[Dispatch code quality reviewer]
+Code reviewer: Issues (Important):
+  - "Validation logic duplicated in 3 places, extract to shared module"
+
+[⚠️ Feedback verification check]
+Controller: This seems reasonable, let me verify...
+
+[Step 1: Use superpowers:receiving-code-review]
+Verification result:
+  ✅ Suggestion aligns with DRY principle
+  ✅ No conflicts with spec
+  ✅ Project has shared utilities module pattern
+  ✅ Decision: Accept this feedback
+
+[Controller to Implementer]: Extract validation logic to shared module.
+
+[Implementer uses test-driven-development]
+RED: Add test for extracted validation function
+GREEN: Extract validation to shared module, make tests pass
+REFACTOR: Clean up imports
+
+[Test failure encountered during GREEN]
+[Implementer uses systematic-debugging]
+Phase 1: Reproduce - Test fails with "TypeError: validation not a function"
+Phase 2: Isolate - Issue only with email validation
+Phase 3: Fix - Missing export for emailValidator
+Phase 4: Verify - All tests passing
+
+[Implementer uses verification-before-completion]
+Run: npm test -- --testPathPattern=validation
+Output: ✅ 12/12 tests passing
+Run: npm run lint
+Output: ✅ No linting errors
+Result: Implementation verified, ready for re-review
+
+[Code reviewer reviews again]
+Code reviewer: ✅ Approved - clean extraction, good coverage
+
+[Mark Task 4 complete]
 
 ...
 
@@ -248,6 +346,23 @@ Done!
 - Repeat until approved
 - Don't skip the re-review
 
+**If code reviewer feedback seems questionable:**
+- **Step 1: Use superpowers:receiving-code-review** to verify feedback BEFORE implementing
+- Check if feedback contradicts spec/requirements
+- Check if feedback is technically correct for this codebase
+- Reject feedback that would break existing functionality
+- Don't blindly implement every suggestion
+- **If accepted → proceed with implementation:**
+  - Step 2: Use **test-driven-development** for implementation
+  - Step 3 (if needed): Use **systematic-debugging** if tests fail
+  - Step 4: Use **verification-before-completion** before claiming done
+- **If rejected → no further action needed**
+- Example triggers:
+  - Suggests removing features explicitly required by spec
+  - Suggests architectural changes without understanding context
+  - Recommends practices that conflict with project conventions
+  - Provides vague feedback like "improve this" without specifics
+
 **If subagent fails task:**
 - Dispatch fix subagent with specific instructions
 - Don't try to fix manually (context pollution)
@@ -260,6 +375,9 @@ Done!
 - **superpowers:protocol-compliance-check** - REQUIRED: Verify implementation matches protocol docs
 - **superpowers:requesting-code-review** - Code review template for reviewer subagents
 - **superpowers:finishing-a-development-branch** - Complete development after all tasks
+
+**Optional but recommended skills:**
+- **superpowers:receiving-code-review** - Verify code review feedback before implementing (use when feedback seems questionable or conflicts with spec)
 
 **Subagents should use:**
 - **superpowers:test-driven-development** - Subagents follow TDD for each task

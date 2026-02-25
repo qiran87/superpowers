@@ -2,7 +2,8 @@
 name: test-driven-development
 description: |
   Use when implementing any feature or bugfix, before writing implementation code.
-  Always check protocol documentation first: verify field names, API paths, and structures match docs/project-analysis/ before writing tests.
+  MANDATORY: MUST READ docs/project-analysis/02-backend-apis.md, 03-backend-domains.md, 04-database-schemas.md, 06-external-apis.md BEFORE writing tests.
+  Verify field names, API paths, and structures match protocol documentation.
   Also triggers for: 字段对齐, 接口对齐, 协议验证, 检查字段名, API路径检查, 新增字段, 修改字段, 协议变更
 ---
 
@@ -99,7 +100,13 @@ digraph tdd_cycle {
 >    Use Skill tool: superpowers:code-structure-reader
 >    ```
 >    - Wait for code-structure-reader to complete
->    - Then read the generated documents
+>
+>    **⚠️ MANDATORY: Read the generated documents:**
+>    - Read `docs/project-analysis/02-backend-apis.md`
+>    - Read `docs/project-analysis/03-backend-domains.md`
+>    - Read `docs/project-analysis/04-database-schemas.md`
+>    - Read `docs/project-analysis/06-external-apis.md` (if using external services)
+>
 >    - Proceed with verification
 >
 > **🔍 PROTOCOL CHANGE DETECTION:**
@@ -114,10 +121,11 @@ digraph tdd_cycle {
 > 1. **STOP writing code immediately**
 >
 > 2. **Read current protocol documentation:**
->    ```bash
->    # Read to understand existing format
->    Read docs/project-analysis/02-backend-apis.md
->    ```
+>
+>    **⚠️ MANDATORY: Execute these Read steps:**
+>    - Read `docs/project-analysis/02-backend-apis.md` to check existing API format
+>    - Read `docs/project-analysis/03-backend-domains.md` to check entity definitions
+>    - Read `docs/project-analysis/06-external-apis.md` if external API involved
 >
 > 3. **Update protocol documentation using Edit tool:**
 >    ```markdown

@@ -1,6 +1,6 @@
 ---
 name: design-with-existing-modules
-description: Use when designing technical solutions to check for reusable existing modules in codebase, analyze component/API/domain/database for reuse/modification/new additions, and update project documentation accordingly
+description: Use when designing technical solutions. MUST READ docs/project-analysis/ documentation BEFORE starting. Check for reusable existing modules in codebase, analyze component/API/domain/database/external-apis for reuse/modification/new additions, and update project documentation accordingly
 ---
 
 # Design with Existing Modules
@@ -126,12 +126,24 @@ fi
 ```
 
 **Read relevant documents based on requirements:**
-- Frontend features → Read `01-frontend-components.md`
-- API endpoints → Read `02-backend-apis.md`
-- Business logic → Read `03-backend-domains.md`
-- Data persistence → Read `04-database-schemas.md`
-- Libraries → Read `05-third-party-deps.md`
-- **External services** → Read `06-external-apis.md` (check for existing adapters)
+
+> **⚠️ MANDATORY: Execute these Read steps before proceeding to Step 2**
+
+> **For ALL design tasks, read these core documents:**
+> - Read `docs/project-analysis/01-frontend-components.md`
+> - Read `docs/project-analysis/02-backend-apis.md`
+> - Read `docs/project-analysis/03-backend-domains.md`
+> - Read `docs/project-analysis/04-database-schemas.md`
+
+> **For specific requirements, also read:**
+> - Frontend features: Already read above
+> - API endpoints: Already read above
+> - Business logic: Already read above
+> - Data persistence: Already read above
+> - Libraries: Read `docs/project-analysis/05-third-party-deps.md`
+> - **External services**: Read `docs/project-analysis/06-external-apis.md`
+
+> **⚠️ DO NOT PROCEED to Step 2 until all relevant documents have been read**
 
 ### Step 2: Analyze Requirements vs Existing Modules
 

@@ -87,26 +87,60 @@ Ready for feedback.
 **If all verifications pass:**
 - Proceed to Step 5 (Continue)
 
-**If any verification fails:** ⭐ REPAIR LOOP
-1. **Document failure:**
-   ```markdown
-   ### Task N: [Task Name]
-   **Verification Status:** ❌ Failed
-   **Failure:** [Description]
-   **Failed Command:** [Command that failed]
-   **Output:** [Error output]
-   ```
-2. **Fix the issue:**
-   - Update task status to ⏳ In Progress (or ⚠️ Blocked if truly blocked)
-   - Apply fix
-   - Re-run verification
-3. **Re-verify:**
-   - If pass: Update status to ✅ Complete
-   - If fail again: Return to fix step
-4. **Only then proceed** to next batch
+**If any verification fails:** ⭐ REPAIR LOOP (Auto-retry up to 3 times)
 
-> **⚠️ CRITICAL:** Do NOT proceed to next batch while verifications are failing.
-> Evidence of passing verification is required before marking tasks complete.
+**Repair loop mechanism:**
+```bash
+MAX_REPAIR_ATTEMPTS=3
+REPAIR_ATTEMPT=1
+
+while [ $REPAIR_ATTEMPT -le $MAX_REPAIR_ATTEMPTS ]; do
+    # Run verification
+    if verification_passes; then
+        break  # Success, exit loop
+    fi
+
+    # Verification failed - attempt repair
+    echo "❌ Verification failed (Attempt $REPAIR_ATTEMPT/$MAX_REPAIR_ATTEMPTS)"
+
+    # 1. Document failure
+    echo "**Verification Status:** ❌ Failed" >> tasks.md
+    echo "**Failed Command:** [command]" >> tasks.md
+    echo "**Output:** [error]" >> tasks.md
+
+    # 2. Attempt fix
+    if can_auto_fix; then
+        echo "🔧 Attempting auto-repair..."
+        apply_fix
+        REPAIR_ATTEMPT=$((REPAIR_ATTEMPT + 1))
+        continue  # Retry
+    else
+        # Cannot auto-fix - request manual intervention
+        echo "🔧 Manual fix required:"
+        echo "   Issue: [description]"
+        echo "   Fix: [steps to fix]"
+        echo ""
+        echo "⏸️  Pausing for manual fix..."
+        return 100  # Request manual intervention
+    fi
+done
+```
+
+**Manual repair process:**
+1. **Document failure:** Record error in tasks.md
+2. **Update task status:** ⏳ In Progress (or ⚠️ Blocked if truly blocked)
+3. **Apply fix:** Implement the fix
+4. **Re-run verification:** Verify fix works
+5. **Re-verify:**
+   - If pass: Update status to ✅ Complete
+   - If fail again: Return to fix step (max 3 attempts)
+6. **Only then proceed** to next batch
+
+> **⚠️ CRITICAL:**
+> - Do NOT proceed to next batch while verifications are failing
+> - Do NOT use `exit 1` (kills the skill) - use `return 100` instead
+> - Evidence of passing verification is required before marking tasks complete
+> - Max 3 repair attempts, then request manual intervention
 
 ### Step 5: Report and Request Feedback
 

@@ -226,20 +226,71 @@ agents/
 - 定义插件市场信息
 - 列出所有可用技能
 
-### 规范工作流 (可选)
+### 规范工作流 (.spec-workflow)
 
-**.spec-workflow 目录** - 规范管理和审批系统:
-- **specs/** - 规范文档存储,按规范名称组织
-- **steering/** - 项目指导文档(product.md, tech.md, structure.md)
-- **approvals/** - 审批请求历史记录
-- **archive/** - 已归档的规范文档
-- **templates/** - 规范和计划模板
-- **user-templates/** - 用户自定义模板
+**⭐ 从 v4.2.0 开始增强为完整的任务跟踪和验证系统**
 
-**当项目使用规范工作流时:**
-- 设计文档应保存到 `.spec-workflow/specs/<name>/`
-- 审批请求通过 MCP 工具管理
-- 实施日志自动记录到规范中
+**目录结构:**
+```
+.spec-workflow/
+├── specs/                    # 规范文档存储
+│   └── <feature-name>/
+│       ├── tasks.md          # 任务清单(带状态跟踪) ⭐ 增强格式
+│       └── verification.md   # 验证检查表 ⭐ 新增
+├── active/                   # 当前工作跟踪
+│   ├── status.md             # 全局状态汇总
+│   └── .gitkeep
+├── steering/                 # 项目指导文档(product.md, tech.md, structure.md)
+├── approvals/                # 审批请求历史记录
+├── archive/                  # 已归档的规范文档
+├── templates/                # 规范和计划模板
+│   ├── tasks-template.md     # 任务文档模板(增强) ⭐ 带状态跟踪
+│   └── verification-template.md  # 验证检查表模板 ⭐ 新增
+├── user-templates/           # 用户自定义模板
+└── global-todos.md           # 跨功能待办事项 ⭐ 新增
+```
+
+**⭐ 增强功能 (v4.2.0):**
+
+**1. 任务状态跟踪 (tasks.md)**
+- **Status 字段:** 🔵 Not Started | ⏳ In Progress | ✅ Complete | ⚠️ Blocked | ⏸️ Deferred
+- **Priority 字段:** P0 (Critical) | P1 (High) | P2 (Medium) | P3 (Low)
+- **Verification 部分:** 验证命令、预期输出、验收标准
+- **TODO Items:** 每个任务可记录发现的待办事项
+- **Acceptance Criteria:** 完成标准检查清单
+
+**2. 验证检查表 (verification.md)**
+- **6部分验证:**
+  - Part 1: Pre-Verification Checklist (任务完成、代码质量、测试)
+  - Part 2: Functional Requirements Checklist (验收标准验证)
+  - Part 3: Documentation Checklist (文档完整性)
+  - Part 4: Integration & Deployment Checklist (集成和部署)
+  - Part 5: TODOs & Gaps Summary (待办事项和已知限制)
+  - Part 6: Final Sign-Off (最终验收确认)
+
+**3. 全局状态跟踪 (active/status.md)**
+- 跟踪所有活跃功能的进度
+- 汇总全局 TODO
+- 显示关键阻塞和警告
+
+**4. 工作流程:**
+```
+计划 → 执行(更新状态) → 验证检查表 → 修复问题 → 重新验证 → 完成
+```
+
+**5. 修复循环:**
+- 如果验证失败,记录问题
+- 修复后更新任务状态
+- 重新运行验证检查表
+- 重复直到所有检查通过
+
+**示例文件:**
+- `.spec-workflow/specs/example-feature/tasks-example.md` - 完整的任务文档示例
+- `.spec-workflow/specs/example-feature/verification-example.md` - 完整的验证检查表示例
+
+**相关技能更新:**
+- `writing-plans` - 引用增强的 tasks-template.md 和验证工作流
+- `verification-before-completion` - 引用 verification-template.md
 
 ### Git 配置
 
@@ -285,12 +336,20 @@ Superpowers 遵循严格的七阶段开发流程,必须按顺序执行:
 ### 3. **writing-plans** (编写计划)
 - **触发:** 批准的设计,在实施前
 - **目的:** 将工作分解为小块任务(每项 2-5 分钟)
-- **输出:** 保存到 `docs/plans/YYYY-MM-DD-<feature-name>.md` 的实施计划
-- **任务结构:**
-  - 精确的文件路径(创建/修改/测试)
-  - 完整的代码(不是"添加验证"这样的模糊指令)
-  - 确切的命令和预期输出
-  - 相关技能引用
+- **输出:**
+  - **Plan:** `docs/plans/YYYY-MM-DD-<feature-name>.md` (传统格式)
+  - **Tasks:** `.spec-workflow/specs/<feature-name>/tasks.md` (增强格式,带状态跟踪) ⭐ v4.2.0
+  - **Verification:** `.spec-workflow/specs/<feature-name>/verification.md` (验证检查表) ⭐ v4.2.0
+- **增强的任务结构 (v4.2.0):**
+  - **Status 字段:** 🔵 Not Started | ⏳ In Progress | ✅ Complete | ⚠️ Blocked | ⏸️ Deferred
+  - **Priority 字段:** P0 (Critical) | P1 (High) | P2 (Medium) | P3 (Low)
+  - **Verification 部分:** 验证命令、预期输出、验收标准
+  - **TODO Items:** 每个任务可记录发现的待办事项
+  - **Acceptance Criteria:** 完成标准检查清单
+- **验证工作流 (v4.2.0):**
+  - 使用 `verification-template.md` 创建 6 部分验证检查表
+  - 在声明完成前逐项验证
+  - 如果失败,进入修复循环直到所有检查通过
 
 ### 4. **执行计划** - 两种模式
 
@@ -553,6 +612,92 @@ cleanup_test_project "$test_dir"
    ---
    ```
 3. 命令会自动被插件系统发现
+
+### 使用增强的 .spec-workflow 系统 ⭐ v4.2.0 新增
+
+**完整工作流:**
+
+**1. 创建任务文档 (tasks.md)**
+```bash
+# 复制模板
+cp .spec-workflow/templates/tasks-template.md .spec-workflow/specs/<feature-name>/tasks.md
+
+# 编辑任务文档,填写:
+# - 任务状态 (Status)
+# - 优先级 (Priority)
+# - 验证方法 (Verification)
+# - 验收标准 (Acceptance Criteria)
+```
+
+**2. 创建验证检查表 (verification.md)**
+```bash
+# 复制模板
+cp .spec-workflow/templates/verification-template.md .spec-workflow/specs/<feature-name>/verification.md
+
+# 根据功能需求填写检查表
+```
+
+**3. 执行阶段 - 更新任务状态**
+```markdown
+# 开始任务时:
+### Task 1: [Task Name]
+- [ ] **Status:** 🔵 Not Started → ⏳ In Progress
+
+# 完成任务时:
+### Task 1: [Task Name]
+- [x] **Status:** ✅ Complete
+- **Actual:** 25 minutes
+```
+
+**4. 发现 TODO 时**
+```markdown
+# 添加到当前任务:
+**TODO Items:**
+- [ ] Fix edge case - Priority: P1 - Discovered at 2026-02-26 14:45
+
+# 如果影响多个功能,添加到 global-todos.md:
+- [ ] [P1-001] - Global issue - Feature - Task - ETA
+```
+
+**5. 验证阶段**
+```bash
+# 读取验证检查表
+cat .spec-workflow/specs/<feature-name>/verification.md
+
+# 逐项执行验证命令
+npm run lint        # 1.2 代码质量验证
+npm test            # 1.3 测试验证
+npm run type-check  # 1.2 类型检查
+
+# 标记完成的检查项
+- [x] **All linting passes**
+  - **Output:** ✅ 0 errors, 0 warnings
+  - **Verified At:** 2026-02-26 15:00
+```
+
+**6. 修复循环**
+```
+验证失败 → 修复问题 → 更新任务状态 → 重新验证 → 重复直到通过
+```
+
+**7. 最终验收**
+```markdown
+## Part 6: Final Sign-Off
+**I have verified that:**
+- [x] All required tasks are complete
+- [x] All acceptance criteria are satisfied
+- [x] All quality gates pass
+- [x] No critical TODOs remain
+
+**Overall Assessment:**
+- **Functional Completeness:** 100% complete
+- **Quality Status:** 🟢 Excellent
+- **Ready for:** Merge | PR
+```
+
+**示例文件:**
+- `.spec-workflow/specs/example-feature/tasks-example.md` - 完整示例
+- `.spec-workflow/specs/example-feature/verification-example.md` - 验证示例
 
 ## 故障排除
 

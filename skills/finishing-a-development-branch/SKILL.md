@@ -66,7 +66,133 @@ Cannot proceed with merge/PR until tests pass.
 
 Stop. Don't proceed to Step 2.
 
-**If tests pass:** Continue to Step 2.
+**If tests pass:** Continue to Spec Workflow Final Acceptance (Step 1.5).
+
+### Step 1.5: Spec Workflow Final Acceptance ⭐ MANDATORY (v4.2.0)
+
+**Before presenting merge options, verify .spec-workflow completeness:**
+
+**Check for Enhanced Spec Workflow:**
+```bash
+# Check if using enhanced .spec-workflow system
+SPEC_WORKFLOW_CHECK=""
+TASKS_FILE=""
+VERIFICATION_FILE=""
+FEATURE=""
+
+# Find tasks.md file
+FOUND_TASKS=$(find .spec-workflow/specs -name "tasks.md" -type f 2>/dev/null | head -1)
+
+if [ -n "$FOUND_TASKS" ]; then
+    echo "📋 Enhanced .spec-workflow system detected"
+    TASKS_FILE="$FOUND_TASKS"
+    FEATURE=$(basename $(dirname "$TASKS_FILE"))
+    VERIFICATION_FILE="$(dirname "$TASKS_FILE")/verification.md"
+
+    # Check tasks.md exists and is readable
+    if [ ! -r "$TASKS_FILE" ]; then
+        echo "❌ Cannot read tasks.md at: $TASKS_FILE"
+        exit 1
+    fi
+
+    echo ""
+    echo "Checking $TASKS_FILE..."
+
+    # Check for incomplete tasks - ONLY match task lines (### Task or - [ ])
+    IN_PROGRESS=0
+    NOT_STARTED=0
+    BLOCKED=0
+
+    # Count using task-line-specific patterns - use wc -l to avoid exit code issues
+    IN_PROGRESS=$(grep -E "^### Task|^- \[ \]" "$TASKS_FILE" 2>/dev/null | grep -E "(Status.*In Progress|⏳)" | wc -l | tr -d ' ')
+    NOT_STARTED=$(grep -E "^### Task|^- \[ \]" "$TASKS_FILE" 2>/dev/null | grep -E "(Status.*Not Started|🔵)" | wc -l | tr -d ' ')
+    BLOCKED=$(grep -E "^### Task|^- \[ \]" "$TASKS_FILE" 2>/dev/null | grep -E "(Status.*Blocked|⚠️)" | wc -l | tr -d ' ')
+
+    if [ "$IN_PROGRESS" -gt 0 ] || [ "$NOT_STARTED" -gt 0 ]; then
+        echo "❌ Incomplete tasks detected:"
+        [ "$IN_PROGRESS" -gt 0 ] && echo "   - In Progress: $IN_PROGRESS"
+        [ "$NOT_STARTED" -gt 0 ] && echo "   - Not Started: $NOT_STARTED"
+        echo ""
+        echo "Cannot proceed with merge/PR until all tasks are complete."
+        echo "Please complete remaining tasks or update tasks.md status."
+        exit 1
+    fi
+
+    if [ "$BLOCKED" -gt 0 ]; then
+        echo "⚠️  Warning: $BLOCKED blocked task(s) detected"
+        echo "   Verify all blockers have workarounds or are resolved."
+    fi
+
+    # Check verification.md if exists
+    if [ -f "$VERIFICATION_FILE" ]; then
+        echo ""
+        echo "Checking $VERIFICATION_FILE..."
+
+        # Check for final sign-off - multiple patterns
+        if ! grep -qE "Implementation Complete.*✅|All Tasks Verified.*✅" "$VERIFICATION_FILE" 2>/dev/null; then
+            echo "❌ Final sign-off not completed in verification.md"
+            echo ""
+            echo "Please complete the verification checklist:"
+            echo "   1. Run all verification commands"
+            echo "   2. Complete Part 6: Final Sign-Off"
+            echo "   3. Mark Implementation Complete: ✅"
+            exit 1
+        fi
+
+        echo "✅ Verification checklist complete"
+    else
+        echo "ℹ️  verification.md not found (optional but recommended)"
+    fi
+
+    # Check for blocking TODOs - ONLY in TODOs & Gaps section
+    P0_COUNT=0
+    P1_COUNT=0
+
+    # Extract TODOs section and count uncompleted P0/P1 items
+    P0_COUNT=$(sed -n '/## TODOs & Gaps/,$ p' "$TASKS_FILE" 2>/dev/null | grep -iE "Priority.*P0|P0.*Critical" | grep -vE "^\s*-\s*\[x\]" | wc -l | tr -d ' ')
+    P1_COUNT=$(sed -n '/## TODOs & Gaps/,$ p' "$TASKS_FILE" 2>/dev/null | grep -iE "Priority.*P1|P1.*High" | grep -vE "^\s*-\s*\[x\]" | wc -l | tr -d ' ')
+
+    # Trim any whitespace and ensure we have numbers
+    P0_COUNT=$(echo "$P0_COUNT" | tr -d ' ')
+    P1_COUNT=$(echo "$P1_COUNT" | tr -d ' ')
+    P0_COUNT=${P0_COUNT:-0}
+    P1_COUNT=${P1_COUNT:-0}
+
+    if [ "$P0_COUNT" -gt 0 ]; then
+        echo "❌ $P0_COUNT P0 (Critical) TODO(s) remain unaddressed"
+        echo ""
+        echo "Cannot proceed with merge/PR until P0 TODOs are resolved."
+        exit 1
+    fi
+
+    if [ "$P1_COUNT" -gt 0 ]; then
+        echo "⚠️  Warning: $P1_COUNT P1 (High) TODO(s) remain"
+        echo "   Recommend addressing before merge."
+    fi
+
+    echo ""
+    echo "✅ Spec workflow verification passed"
+    echo "   - All tasks complete"
+    [ -f "$VERIFICATION_FILE" ] && echo "   - Verification checklist complete" || echo "   - Verification checklist: N/A"
+    echo "   - No blocking TODOs"
+else
+    echo "ℹ️  Enhanced .spec-workflow system not detected"
+    echo "   Consider using .spec-workflow for better tracking (v4.2.0+)"
+fi
+```
+
+**If spec workflow checks fail:**
+```
+Spec workflow incomplete. Cannot proceed:
+
+[Show failures]
+
+Please address above issues before merge/PR.
+```
+
+Stop. Don't proceed to Step 2.
+
+**If spec workflow checks pass (or not using enhanced system):** Continue to Step 2.
 
 ### Step 2: Determine Base Branch
 

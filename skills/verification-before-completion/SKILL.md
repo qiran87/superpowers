@@ -13,6 +13,92 @@ Claiming work is complete without verification is dishonesty, not efficiency.
 
 **Violating the letter of this rule is violating the spirit of this rule.**
 
+## ⭐ NEW: Comprehensive Verification Checklist
+
+**从 v4.2.0 开始,所有功能开发完成后必须使用增强的验证检查表:**
+
+### 验证文档位置
+
+`.spec-workflow/specs/<feature-name>/verification.md`
+
+**使用模板:** `.spec-workflow/templates/verification-template.md`
+
+### 6部分验证检查表
+
+**1. Pre-Verification Checklist (预验证检查)**
+- [ ] 所有任务在 tasks.md 中标记为 Complete
+- [ ] 没有阻塞性的 TODO (P0, P1)
+- [ ] 没有阻塞性问题
+
+**2. Code Quality Verification (代码质量验证)**
+- [ ] 所有 linting 通过 (`npm run lint` 或等效命令)
+- [ ] 类型检查通过 (`npm run type-check` 或 `tsc --noEmit`)
+- [ ] 构建成功 (`npm run build`)
+
+**3. Testing Verification (测试验证)**
+- [ ] 所有单元测试通过 (`npm test`)
+- [ ] 集成测试通过 (如适用)
+- [ ] E2E 测试通过 (如适用)
+
+**4. Functional Requirements Checklist (功能需求检查)**
+- [ ] 所有验收标准已满足
+- [ ] 边缘情况已处理
+- [ ] 用户故事已实现
+
+**5. Documentation & Integration (文档和集成)**
+- [ ] README 已更新
+- [ ] API 文档已更新 (如适用)
+- [ ] 组件已集成到应用 (参见 Component Integration Verification)
+
+**6. Final Sign-Off (最终验收)**
+- [ ] 所有质量门通过
+- [ ] 所有文档最新
+- [ ] 没有关键 TODO 遗留
+- [ ] 功能完整性: 100%
+
+### 验证工作流
+
+**在声明完成之前:**
+
+1. **读取验证文档:**
+   ```bash
+   # 读取该功能的 verification.md
+   cat .spec-workflow/specs/<feature-name>/verification.md
+   ```
+
+2. **逐项执行验证:**
+   - 运行每个验证命令
+   - 检查输出是否符合预期
+   - 标记完成的检查项
+
+3. **记录验证结果:**
+   ```markdown
+   ### 1.2 Code Quality Verification
+   - [x] **All linting passes**
+     - **Command:** `npm run lint`
+     - **Expected:** 0 errors, 0 warnings
+     - **Output:** ✅ 0 errors, 0 warnings
+     - **Verified At:** 2026-02-26 15:30
+     - **Verified By:** Claude (Agent 1)
+   ```
+
+4. **如果验证失败:**
+   - 记录失败项
+   - 修复问题
+   - 重新验证
+   - 重复直到所有检查通过
+
+5. **验证通过后更新 Sign-Off:**
+   ```markdown
+   **Overall Assessment:**
+   - **Functional Completeness:** 100% complete
+   - **Quality Status:** 🟢 Excellent
+   - **Ready for:** Merge | PR
+
+   **Verified By:** [Agent Name]
+   **Verified At:** [Timestamp]
+   ```
+
 ## The Iron Law
 
 ```

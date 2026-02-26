@@ -1,0 +1,15 @@
+# Active Work Directory
+
+This directory contains active work being tracked by the spec-workflow system.
+
+Each active feature has its own subdirectory with:
+- `tasks.md` - Link to the actual tasks document in `specs/<feature>/tasks.md`
+- `status.md` - Current status snapshot
+
+## Structure
+
+```
+active/
+├── current-feature-link -> ../specs/current-feature/tasks.md
+└── status.md - Global status of active work
+```

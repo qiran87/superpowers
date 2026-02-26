@@ -31,8 +31,67 @@ When reviewing completed work, you will:
 > - **Rationale:** Protocol violations break contracts between components and must be fixed before quality review
 >
 > **If NO critical violations:**
-> - Proceed to code quality assessment (Step 2)
+> - Proceed to Spec Workflow Completeness Check (below)
 > - Include compliance check results in your review report
+
+> **📋 Spec Workflow Completeness Check ⭐ MANDATORY (v4.2.0):**
+>
+> After protocol compliance, you **MUST** verify the implementation follows the enhanced .spec-workflow system.
+>
+> **Execute this step:**
+> 1. **Check for tasks.md** at `.spec-workflow/specs/<feature-name>/tasks.md`
+> 2. **Check for verification.md** at `.spec-workflow/specs/<feature-name>/verification.md`
+>
+> **If tasks.md exists (Enhanced Format):**
+>
+> **MANDATORY Checks:**
+> - [ ] All implemented tasks have status ✅ Complete
+> - [ ] All in-progress tasks have status ⏳ In Progress
+> - [ ] All not started tasks have status 🔵 Not Started
+> - [ ] Actual time is recorded for completed tasks
+> - [ ] No tasks are in ⚠️ Blocked state without documented workaround
+>
+> **If status checks fail:**
+> - **Severity:** CRITICAL (blocks PR merge)
+> - **Action:** Request implementer to update task statuses
+> - **Rationale:** Inaccurate status tracking prevents proper progress monitoring
+>
+> **If verification.md exists:**
+>
+> **MANDATORY Checks:**
+> - [ ] Part 1 (Pre-Verification Checklist) is completed
+>   - All required tasks marked complete
+>   - Code quality verifications passed (linting, type-check, build)
+>   - Testing verifications passed (unit, integration, E2E)
+> - [ ] Part 2 (Functional Requirements) has verification results
+>   - Acceptance criteria verified with evidence
+>   - Edge cases tested
+> - [ ] Part 6 (Final Sign-Off) has completion declaration
+>   - "I have verified that:" section all checked
+>   - Overall assessment shows 100% completeness
+>
+> **If verification checks fail:**
+> - **Severity:** CRITICAL (blocks PR merge)
+> - **Action:** Request implementer to complete verification checklist
+> - **Rationale:** Unverified functionality cannot be considered complete
+>
+> **TODO Items Check:**
+> - [ ] No P0 (Critical) TODOs remain unaddressed
+> - [ ] No P1 (High) TODOs remain unaddressed
+> - [ ] P2/P3 TODOs are documented and estimated
+>
+> **If P0/P1 TODOs found:**
+> - **Severity:** IMPORTANT (should address before merge)
+> - **Action:** Request implementer to address or provide ETA
+>
+> **If tasks.md or verification.md do NOT exist:**
+> - **Severity:** WARNING (recommended but not blocking)
+> - **Action:** Recommend using enhanced .spec-workflow system
+> - **Rationale:** Enhanced system provides better tracking and verification
+>
+> **If ALL checks pass:**
+> - Proceed to code quality assessment (Step 2)
+> - Include spec workflow results in your review report
 
 2. **Code Quality Assessment**:
    - Review code for adherence to established patterns and conventions

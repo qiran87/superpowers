@@ -8,14 +8,61 @@ Superpowers 是一个完整的软件开发工作流技能库,为 AI 编程代理
 
 **当前版本:** 4.2.0
 
+## 项目目录结构
+
+```
+superpowers/
+├── skills/                    # 核心技能系统(17 个技能)
+│   ├── brainstorming/         # 头脑风暴技能
+│   ├── test-driven-development/
+│   ├── writing-skills/        # 技能创建指南
+│   └── ...
+├── commands/                  # 斜杠命令定义(快捷方式)
+│   ├── brainstorm.md          # /brainstorm 命令
+│   ├── write-plan.md          # /write-plan 命令
+│   └── execute-plan.md        # /execute-plan 命令
+├── agents/                    # 子代理配置
+│   └── code-reviewer.md       # 代码审查代理配置
+├── hooks/                     # 钩子脚本
+│   ├── session-start.sh       # SessionStart 钩子
+│   ├── run-hook.cmd           # Windows polyglot wrapper
+│   └── hooks.json             # 钩子配置
+├── tests/                     # 测试框架
+│   └── claude-code/
+│       ├── run-skill-tests.sh # 主测试脚本
+│       ├── test-helpers.sh    # 测试辅助函数
+│       └── test-*.sh          # 各技能测试文件
+├── .spec-workflow/            # 规范工作流管理(可选)
+│   ├── specs/                 # 规范文档存储
+│   ├── steering/              # 指导文档(product.md, tech.md)
+│   ├── approvals/             # 审批请求历史
+│   ├── archive/               # 归档的规范
+│   ├── templates/             # 规范和计划模板
+│   └── user-templates/        # 用户自定义模板
+├── docs/
+│   ├── plans/                 # 设计文档和实施计划
+│   │   └── YYYY-MM-DD-*.md    # 按日期组织
+│   ├── README.codex.md        # Codex 平台指南
+│   └── README.opencode.md     # OpenCode 平台指南
+├── .claude-plugin/            # 插件配置
+│   ├── plugin.json            # 插件清单
+│   ├── hooks.json             # 钩子配置(符号链接到 hooks/hooks.json)
+│   └── marketplace.json       # 市场发布配置
+├── .worktrees/                # Git worktree 目录(首选)
+├── .gitignore                 # 忽略 .worktrees/, .claude/, node_modules/
+├── CLAUDE.md                  # 本文件
+└── README.md                  # 项目概述
+```
+
 **核心架构:**
 - **技能系统 (skills/):** 核心,包含可重用的开发技能,每个技能都是独立的参考文档
-- **命令 (commands/):** 斜杠命令,用于触发特定工作流
-- **代理 (agents/):** 子代理配置,用于特定任务(如代码审查)
-- **钩子 (hooks/):** SessionStart 钩子,自动注入技能上下文到每个会话
+- **命令 (commands/):** 斜杠命令定义文件,提供工作流的快捷方式
+- **代理 (agents/):** 子代理配置文件,定义特定任务行为(如代码审查)
+- **钩子 (hooks/):** SessionStart 钩子脚本,自动注入技能上下文到每个会话
 - **插件配置 (.claude-plugin/):** 插件清单和钩子配置
 - **测试 (tests/):** 针对不同平台的技能验证测试
 - **文档 (docs/):** 针对 Codex 和 OpenCode 的安装指南、设计文档和实施计划
+- **规范工作流 (.spec-workflow/):** 可选的规范管理、审批和模板系统
 
 ## 开发命令
 
@@ -31,6 +78,12 @@ cd tests/claude-code
 
 # 运行完整的集成测试(耗时 10-30 分钟)
 ./run-skill-tests.sh --integration
+
+# 详细输出模式
+./run-skill-tests.sh --verbose
+
+# 自定义超时时间
+./run-skill-tests.sh --timeout 1800
 ```
 
 ### 插件命令
@@ -44,6 +97,22 @@ Superpowers 作为 Claude Code 插件运行,通过斜杠命令提供快捷方式
 ```
 
 **注意:** 技能主要通过描述其用途自动触发,斜杠命令只是快捷方式。
+
+### 命令目录 (commands/)
+
+**命令结构:**
+- 每个命令是一个 Markdown 文件,包含 YAML frontmatter 和命令提示
+- **frontmatter 字段:**
+  - `name`: 命令名称
+  - `description`: 命令描述
+  - `prompt`: 要发送给 Claude 的提示内容
+
+**可用命令:**
+- `brainstorm.md` - 头脑风暴命令快捷方式
+- `write-plan.md` - 编写计划命令快捷方式
+- `execute-plan.md` - 执行计划命令快捷方式
+- `debug.md` - 调试工作流命令
+- `protocol-change.md` - 协议变更工作流命令
 
 ## 核心架构概念
 
@@ -103,27 +172,90 @@ Superpowers 作为 Claude Code 插件运行,通过斜杠命令提供快捷方式
 - 双重代码审查:规范合规性审查 → 代码质量审查
 - 使用 Task 工具分派子代理,每个子代理有独立的上下文
 
+**Agents 目录结构:**
+```
+agents/
+└── code-reviewer.md    # 代码审查代理配置
+```
+
 ### 钩子(Hooks)系统
 
 **SessionStart 钩子** (`hooks/session-start.sh`):
 - 自动注入 `using-superpowers` 技能内容
 - 检测遗留的 `~/.config/superpowers/skills` 目录并发出警告
 - 使用高效的参数转义方法(JSON 嵌入)
-- 在 hooks.json 中配置
+- 在 `hooks/hooks.json` 和 `.claude-plugin/hooks.json` 中配置
+
+**Hooks 配置** (`hooks/hooks.json`):
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**关键配置:**
+- **matcher:** 匹配模式 (startup|resume|clear|compact)
+- **async:** true - 异步执行以防止 Windows 终端冻结
+- **command:** 钩子脚本路径,使用 `${CLAUDE_PLUGIN_ROOT}` 变量
 
 ### 插件配置
 
 **plugin.json** - 插件清单:
 - 定义插件名称、描述、版本和关键词
-- 关键词用于插件发现:"skills", "tdd", "debugging", "collaboration"
+- 关键词用于插件发现:"skills", "tdd", "debugging", "collaboration", "best-practices", "workflows"
 
 **hooks.json** - 钩子配置 (位于 `.claude-plugin/hooks.json`):
+- 符号链接到 `hooks/hooks.json`
 - 定义 SessionStart 钩子
 - 异步执行以防止 Windows 终端冻结
 
 **marketplace.json** - 市场发布配置 (位于 `.claude-plugin/marketplace.json`):
 - 定义插件市场信息
 - 列出所有可用技能
+
+### 规范工作流 (可选)
+
+**.spec-workflow 目录** - 规范管理和审批系统:
+- **specs/** - 规范文档存储,按规范名称组织
+- **steering/** - 项目指导文档(product.md, tech.md, structure.md)
+- **approvals/** - 审批请求历史记录
+- **archive/** - 已归档的规范文档
+- **templates/** - 规范和计划模板
+- **user-templates/** - 用户自定义模板
+
+**当项目使用规范工作流时:**
+- 设计文档应保存到 `.spec-workflow/specs/<name>/`
+- 审批请求通过 MCP 工具管理
+- 实施日志自动记录到规范中
+
+### Git 配置
+
+**.gitignore 配置:**
+```gitignore
+.worktrees/           # Git worktree 目录(项目本地,隐藏)
+.private-journal/     # 私人日志
+.claude/              # Claude 临时文件
+node_modules/         # Node.js 依赖
+```
+
+**安全验证:**
+```bash
+# 验证 worktree 目录被 gitignore
+git check-ignore -q .worktrees 2>/dev/null
+```
 
 ## 核心开发工作流
 
@@ -211,6 +343,24 @@ Superpowers 遵循严格的七阶段开发流程,必须按顺序执行:
 - `assert_*` 函数 - 断言函数(contains, not_contains, count, order)
 - `create_test_project` - 创建临时测试目录
 
+**测试辅助函数:**
+```bash
+source test-helpers.sh
+
+# 运行 Claude 并捕获输出
+output=$(run_claude "提示内容" [超时秒数])
+
+# 断言函数
+assert_contains "$output" "模式" "测试名称"
+assert_not_contains "$output" "模式" "测试名称"
+assert_count "$output" "模式" 数量 "测试名称"
+assert_order "$output" "模式A" "模式B" "测试名称"
+
+# 创建测试项目
+test_dir=$(create_test_project)
+cleanup_test_project "$test_dir"
+```
+
 ## Graphviz 流程图约定
 
 Superpowers 使用 DOT/GraphViz 流程图作为可执行规范定义:
@@ -260,6 +410,12 @@ npm install  # 或项目特定的设置命令
 
 # 验证干净的测试基线
 npm test
+```
+
+**Worktree 清理:**
+```bash
+# 完成后清理 worktree
+git worktree remove "$path"
 ```
 
 ## 文档约定
@@ -317,6 +473,11 @@ npm test
 - shell 脚本使用 POSIX 兼容语法(`${BASH_SOURCE[0]:-$0}`)
 - 路径处理使用双引号和正斜杠
 - PowerShell 和 Git Bash 的特殊处理
+
+### Windows 特定注意事项
+- 使用 `run-hook.cmd` polyglot wrapper 处理钩子执行
+- SessionStart 钩子必须异步执行以防止 TUI 冻结
+- JSON 转义使用 bash 参数替换而非字符循环
 
 ## 常见任务
 
@@ -379,6 +540,20 @@ cleanup_test_project "$test_dir"
 
 应该触发 brainstorming 技能
 
+### 创建新命令
+
+1. 在 `commands/` 目录创建新的 Markdown 文件
+2. 添加 YAML frontmatter:
+   ```yaml
+   ---
+   name: command-name
+   description: 简短描述
+   prompt: |
+     要发送给 Claude 的提示内容
+   ---
+   ```
+3. 命令会自动被插件系统发现
+
 ## 故障排除
 
 ### SessionStart 钩子失败
@@ -410,6 +585,16 @@ cleanup_test_project "$test_dir"
 2. 检查分支名称是否已存在
 3. 验证 git worktree add 语法
 4. 检查磁盘空间
+
+### Windows 特定问题
+
+**症状:** 终端冻结、钩子不执行
+
+**检查:**
+1. 验证 hooks.json 中 `async: true`
+2. 检查 run-hook.cmd 文件存在
+3. 验证 LF 行结尾(.gitattributes)
+4. 检查 PowerShell 或 Git Bash 兼容性
 
 ## 相关资源
 
@@ -444,6 +629,12 @@ cleanup_test_project "$test_dir"
 - tests/claude-code/README.md - 测试套件文档
 - tests/subagent-driven-dev/ - 完整工作流示例
 - docs/testing.md - 测试指南
+
+**工作流参考:**
+- commands/brainstorm.md - 头脑风暴命令
+- commands/write-plan.md - 编写计划命令
+- commands/execute-plan.md - 执行计划命令
+- agents/code-reviewer.md - 代码审查代理
 
 ## 贡献指南
 
